@@ -1,0 +1,292 @@
+{
+  "enabled": true,
+  "player": {
+    "name": "Abinesh_sk",
+    "level": 3,
+    "xp": 352,
+    "xpToNextLevel": 148,
+    "title": "Test Engineer",
+    "coins": 300,
+    "streak": 0,
+    "lastTestDate": null,
+    "totalTests": 59,
+    "totalPassed": 23,
+    "totalFailed": 36,
+    "playTime": 0,
+    "sessionStart": 1755519492984
+  },
+  "achievements": {
+    "firstTest": {
+      "id": "first_test",
+      "name": "🎯 First Strike",
+      "description": "Run your first test",
+      "unlocked": true,
+      "xp": 10,
+      "coins": 5
+    },
+    "firstPass": {
+      "id": "first_pass",
+      "name": "✅ Green Light",
+      "description": "Pass your first test",
+      "unlocked": true,
+      "xp": 15,
+      "coins": 10
+    },
+    "tenTests": {
+      "id": "ten_tests",
+      "name": "🔟 Decimal System",
+      "description": "Run 10 tests",
+      "unlocked": true,
+      "xp": 25,
+      "coins": 20
+    },
+    "threeStreak": {
+      "id": "three_streak",
+      "name": "🔥 On Fire",
+      "description": "3 passing tests in a row",
+      "unlocked": false,
+      "xp": 30,
+      "coins": 25
+    },
+    "sevenStreak": {
+      "id": "seven_streak",
+      "name": "🌟 Lucky Seven",
+      "description": "7 passing tests in a row",
+      "unlocked": false,
+      "xp": 50,
+      "coins": 50
+    },
+    "thirtyStreak": {
+      "id": "thirty_streak",
+      "name": "💎 Diamond Streak",
+      "description": "30 passing tests in a row",
+      "unlocked": false,
+      "xp": 200,
+      "coins": 200
+    },
+    "speedDemon": {
+      "id": "speed_demon",
+      "name": "⚡ Speed Demon",
+      "description": "Complete a test in under 5 seconds",
+      "unlocked": false,
+      "xp": 40,
+      "coins": 30
+    },
+    "lightningFast": {
+      "id": "lightning_fast",
+      "name": "⚡⚡ Lightning Fast",
+      "description": "Complete 5 tests in under 1 minute",
+      "unlocked": false,
+      "xp": 75,
+      "coins": 60
+    },
+    "centurion": {
+      "id": "centurion",
+      "name": "💯 Centurion",
+      "description": "Run 100 tests total",
+      "unlocked": false,
+      "xp": 100,
+      "coins": 100
+    },
+    "millennial": {
+      "id": "millennial",
+      "name": "🎖️ Millennial",
+      "description": "Run 1000 tests total",
+      "unlocked": false,
+      "xp": 500,
+      "coins": 500
+    },
+    "comeback": {
+      "id": "comeback",
+      "name": "🔄 Comeback Kid",
+      "description": "Pass a test after 3 failures",
+      "unlocked": false,
+      "xp": 35,
+      "coins": 30
+    },
+    "debugger": {
+      "id": "debugger",
+      "name": "🐛 Bug Hunter",
+      "description": "Fix 10 failing tests",
+      "unlocked": false,
+      "xp": 60,
+      "coins": 50
+    },
+    "earlyBird": {
+      "id": "early_bird",
+      "name": "🌅 Early Bird",
+      "description": "Run tests before 6 AM",
+      "unlocked": false,
+      "xp": 20,
+      "coins": 15
+    },
+    "nightOwl": {
+      "id": "night_owl",
+      "name": "🦉 Night Owl",
+      "description": "Run tests after midnight",
+      "unlocked": false,
+      "xp": 20,
+      "coins": 15
+    },
+    "weekendWarrior": {
+      "id": "weekend_warrior",
+      "name": "⚔️ Weekend Warrior",
+      "description": "Run tests on weekend",
+      "unlocked": false,
+      "xp": 25,
+      "coins": 20
+    },
+    "perfectScore": {
+      "id": "perfect_score",
+      "name": "🏆 Perfection",
+      "description": "Pass 50 tests without a single failure",
+      "unlocked": false,
+      "xp": 150,
+      "coins": 150
+    },
+    "aiMaster": {
+      "id": "ai_master",
+      "name": "🤖 AI Master",
+      "description": "Use AI to fix 5 tests",
+      "unlocked": false,
+      "xp": 80,
+      "coins": 70
+    },
+    "marathoner": {
+      "id": "marathoner",
+      "name": "🏃 Marathoner",
+      "description": "Run tests for 2 hours straight",
+      "unlocked": false,
+      "xp": 100,
+      "coins": 90
+    },
+    "easterEgg": {
+      "id": "easter_egg",
+      "name": "🥚 Easter Egg",
+      "description": "???",
+      "unlocked": false,
+      "xp": 100,
+      "coins": 100
+    },
+    "jarvisWhisperer": {
+      "id": "jarvis_whisperer",
+      "name": "🎭 JARVIS Whisperer",
+      "description": "Use voice commands 50 times",
+      "unlocked": false,
+      "xp": 75,
+      "coins": 75
+    }
+  },
+  "levels": {
+    "1": {
+      "title": "Rookie Tester",
+      "minXP": 0
+    },
+    "2": {
+      "title": "Junior QA",
+      "minXP": 100
+    },
+    "3": {
+      "title": "Test Engineer",
+      "minXP": 250
+    },
+    "4": {
+      "title": "Senior Tester",
+      "minXP": 500
+    },
+    "5": {
+      "title": "QA Specialist",
+      "minXP": 1000
+    },
+    "6": {
+      "title": "Test Architect",
+      "minXP": 2000
+    },
+    "7": {
+      "title": "Quality Guardian",
+      "minXP": 3500
+    },
+    "8": {
+      "title": "Bug Destroyer",
+      "minXP": 5000
+    },
+    "9": {
+      "title": "Test Wizard",
+      "minXP": 7500
+    },
+    "10": {
+      "title": "QA Legend",
+      "minXP": 10000
+    },
+    "11": {
+      "title": "Testing Deity",
+      "minXP": 15000
+    },
+    "12": {
+      "title": "JARVIS Commander",
+      "minXP": 20000
+    }
+  },
+  "dailyChallenge": {
+    "active": false,
+    "description": "",
+    "target": 0,
+    "progress": 0,
+    "reward": {
+      "xp": 0,
+      "coins": 0
+    },
+    "expiresAt": null
+  },
+  "leaderboard": [],
+  "soundEffects": {
+    "levelUp": "🎵 Level Up!",
+    "achievement": "🏅 Achievement Unlocked!",
+    "coinCollect": "💰 Coins!",
+    "testPass": "✅ Success!",
+    "testFail": "❌ Failed!",
+    "streak": "🔥 Streak!"
+  },
+  "shop": {
+    "themes": [
+      {
+        "id": "iron_man",
+        "name": "Iron Man Theme",
+        "cost": 500,
+        "owned": false
+      },
+      {
+        "id": "matrix",
+        "name": "Matrix Theme",
+        "cost": 750,
+        "owned": false
+      },
+      {
+        "id": "tron",
+        "name": "Tron Theme",
+        "cost": 600,
+        "owned": false
+      }
+    ],
+    "powerUps": [
+      {
+        "id": "xp_boost",
+        "name": "2X XP Boost (1 hour)",
+        "cost": 100,
+        "active": false
+      },
+      {
+        "id": "streak_shield",
+        "name": "Streak Shield (protects 1 fail)",
+        "cost": 150,
+        "active": false
+      },
+      {
+        "id": "auto_fix",
+        "name": "Auto-Fix Helper",
+        "cost": 200,
+        "active": false
+      }
+    ]
+  }
+}

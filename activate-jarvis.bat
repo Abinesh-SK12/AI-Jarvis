@@ -1,0 +1,3 @@
+@echo off
+echo Activating JARVIS...
+node jarvis-terminal.js

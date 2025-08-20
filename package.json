@@ -1,22 +1,59 @@
 {
   "name": "ai-jarvis",
   "version": "1.0.0",
-  "description": "An intelligent AI assistant system",
-  "main": "index.js",
+  "description": "AI-powered Jarvis assistant with Cypress testing integration",
+  "main": "jarvis-cli.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "test": "jest"
+    "start": "node jarvis-terminal.js",
+    "jarvis": "node jarvis-terminal.js",
+    "jarvis-cli": "node jarvis-cli.js",
+    "setup": "node setup.js",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "test": "cypress run",
+    "test:jarvis": "cypress run --spec \"cypress/e2e/Groq/jarvis_*.cy.js\"",
+    "ai:run": "node run-ai-tests.js",
+    "enhance": "node enhance-jarvis-commands.js",
+    "clean": "node -e \"const fs=require('fs'),path=require('path');['cypress/screenshots','cypress/videos','cypress/jarvis-reports'].forEach(f=>{try{fs.rmSync(f,{recursive:true,force:true,maxRetries:3})}catch(e){}fs.mkdirSync(f,{recursive:true})})\""
   },
   "keywords": [
     "ai",
     "assistant",
     "jarvis",
     "automation",
-    "nlp"
+    "nlp",
+    "cypress",
+    "testing",
+    "groq",
+    "gemini",
+    "discord"
   ],
   "author": "",
   "license": "MIT",
-  "dependencies": {},
-  "devDependencies": {}
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.11.0",
+    "cypress-real-events": "^1.14.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "form-data": "^4.0.4",
+    "googleapis": "^105.0.0",
+    "imap": "^0.8.19",
+    "node-fetch": "^2.7.0",
+    "node-notifier": "^10.0.1",
+    "nodemailer": "^7.0.5",
+    "open": "^10.2.0",
+    "say": "^0.16.0",
+    "tesseract.js": "^6.0.1"
+  },
+  "devDependencies": {
+    "cypress": "^14.5.3",
+    "cypress-iframe": "^1.0.1",
+    "eslint": "^8.56.0",
+    "eslint-plugin-cypress": "^2.15.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
 }
