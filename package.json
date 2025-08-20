@@ -1,0 +1,22 @@
+{
+  "name": "ai-jarvis",
+  "version": "1.0.0",
+  "description": "An intelligent AI assistant system",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest"
+  },
+  "keywords": [
+    "ai",
+    "assistant",
+    "jarvis",
+    "automation",
+    "nlp"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
