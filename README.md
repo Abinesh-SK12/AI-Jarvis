@@ -80,7 +80,7 @@ To create an intelligent, intuitive, and incredibly helpful AI assistant that ma
       <sub>Seamlessly connect with external services</sub>
     </td>
     <td align="center">
-      <img src="https://img.icons8.com/fluency/96/000000/voice-recognition.png" width="60" height="60"><br>
+      <img src="https://img.icons8.com/fluency/96/000000/microphone.png" width="60" height="60"><br>
       <b>🎙️ Voice Recognition</b><br>
       <sub>Advanced speech-to-text capabilities</sub>
     </td>
