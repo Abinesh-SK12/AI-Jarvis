@@ -1,0 +1,1449 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STARK INDUSTRIES - JARVIS Analysis Report - Aeromodelling Program</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* STARK INDUSTRIES - IRON MAN THEME */
+        :root {
+            --stark-red: #FF0000;
+            --stark-gold: #FFD700;
+            --arc-blue: #00D4FF;
+            --arc-glow: #00E5FF;
+            --stark-metal: #C0C0C0;
+            --stark-dark: #0A0000;
+            --stark-black: #000000;
+            --hud-green: #00FF00;
+            --warning-orange: #FFA000;
+            --danger-red: #FF1744;
+            --bg-primary: #000000;
+            --bg-secondary: #1A0000;
+            --bg-gradient: linear-gradient(135deg, #000000, #1A0000, #330000);
+            --text-primary: #FFFFFF;
+            --text-secondary: #FFD700;
+            --border-color: rgba(255, 0, 0, 0.4);
+            --accent-primary: #FF0000;
+            --accent-secondary: #FFD700;
+            --success: #00FF88;
+            --danger: #FF1744;
+            --warning: #FFA000;
+            --info: #00D4FF;
+            --card-bg: rgba(255, 0, 0, 0.05);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Rajdhani', 'Orbitron', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(0, 212, 255, 0.06) 0%, transparent 70%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            font-weight: 500;
+        }
+        
+        /* STARK TECH GRID BACKGROUND */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 0, 0, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: stark-grid-move 15s linear infinite;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+        
+        @keyframes stark-grid-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        /* IRON MAN PARTICLES & ARC REACTOR EFFECTS */
+        @keyframes iron-particle-float {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(200px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .stark-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .stark-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--stark-red);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--stark-red);
+            animation: iron-particle-float 12s linear infinite;
+            opacity: 0.6;
+        }
+        
+        .stark-particle.gold {
+            background: var(--stark-gold);
+            box-shadow: 0 0 10px var(--stark-gold);
+            animation-duration: 15s;
+        }
+        
+        .stark-particle.blue {
+            background: var(--arc-blue);
+            box-shadow: 0 0 10px var(--arc-blue);
+            animation-duration: 10s;
+        }
+        
+        /* ARC REACTOR CORE STYLES */
+        .arc-reactor {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            margin: 20px auto;
+            filter: drop-shadow(0 0 30px var(--arc-blue));
+        }
+        
+        .arc-reactor-core {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: arc-spin 6s linear infinite;
+        }
+        
+        @keyframes arc-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .arc-ring {
+            position: absolute;
+            border: 2px solid var(--arc-blue);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 15px var(--arc-blue),
+                inset 0 0 15px var(--arc-blue);
+            animation: arc-pulse 3s ease-in-out infinite;
+        }
+        
+        .arc-ring-1 {
+            width: 100%;
+            height: 100%;
+            animation-delay: 0s;
+        }
+        
+        .arc-ring-2 {
+            width: 75%;
+            height: 75%;
+            top: 12.5%;
+            left: 12.5%;
+            animation-delay: 0.5s;
+        }
+        
+        .arc-ring-3 {
+            width: 50%;
+            height: 50%;
+            top: 25%;
+            left: 25%;
+            animation-delay: 1s;
+        }
+        
+        .arc-center {
+            position: absolute;
+            width: 25%;
+            height: 25%;
+            top: 37.5%;
+            left: 37.5%;
+            background: radial-gradient(circle, var(--arc-blue) 0%, rgba(0, 212, 255, 0.8) 40%, transparent 70%);
+            border-radius: 50%;
+            box-shadow: 0 0 30px var(--arc-blue);
+            animation: arc-core-glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes arc-core-glow {
+            0%, 100% { 
+                box-shadow: 0 0 30px var(--arc-blue);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 50px var(--arc-blue), 0 0 80px var(--arc-blue);
+                transform: scale(1.1);
+            }
+        }
+        
+        @keyframes arc-pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                opacity: 1;
+                box-shadow: 
+                    0 0 15px var(--arc-blue),
+                    inset 0 0 15px var(--arc-blue);
+            }
+            50% { 
+                transform: scale(1.05); 
+                opacity: 0.8;
+                box-shadow: 
+                    0 0 25px var(--arc-blue),
+                    inset 0 0 25px var(--arc-blue);
+            }
+        }
+        
+        /* Main container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* STARK INDUSTRIES HEADER */
+        .header {
+            background: linear-gradient(135deg, 
+                rgba(255, 0, 0, 0.15) 0%, 
+                rgba(255, 215, 0, 0.08) 50%, 
+                rgba(0, 212, 255, 0.1) 100%);
+            backdrop-filter: blur(15px);
+            border: 2px solid var(--stark-red);
+            border-radius: 25px;
+            padding: 50px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 40px rgba(255, 0, 0, 0.3),
+                inset 0 0 40px rgba(0, 212, 255, 0.1);
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent, 
+                var(--stark-red), 
+                transparent, 
+                var(--stark-gold), 
+                transparent,
+                var(--arc-blue),
+                transparent);
+            animation: stark-rotate 4s linear infinite;
+            opacity: 0.2;
+        }
+        
+        @keyframes stark-rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        
+        .stark-logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2em;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--stark-red), var(--stark-gold), var(--stark-red));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: stark-gradient 3s ease infinite;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+            letter-spacing: 3px;
+        }
+        
+        .jarvis-logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 4em;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--arc-blue), var(--stark-gold), var(--arc-blue));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: stark-gradient 3s ease infinite;
+            margin: 20px 0;
+            text-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
+            letter-spacing: 5px;
+        }
+        
+        @keyframes stark-gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .test-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            color: var(--stark-gold);
+            font-weight: 500;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            letter-spacing: 2px;
+        }
+        
+        .stark-subtitle {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1em;
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.2em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: stark-pulse 2s infinite;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .status-passed {
+            background: linear-gradient(135deg, var(--success), #00FF88);
+            color: var(--stark-black);
+            box-shadow: 
+                0 4px 20px rgba(0, 255, 136, 0.5),
+                0 0 30px rgba(0, 255, 136, 0.3);
+            border-color: var(--success);
+        }
+        
+        .status-failed {
+            background: linear-gradient(135deg, var(--stark-red), #FF1744);
+            color: white;
+            box-shadow: 
+                0 4px 20px rgba(255, 0, 0, 0.5),
+                0 0 30px rgba(255, 0, 0, 0.3);
+            border-color: var(--stark-red);
+        }
+        
+        @keyframes stark-pulse {
+            0% { 
+                transform: scale(1); 
+                box-shadow: 
+                    0 4px 20px rgba(255, 0, 0, 0.5),
+                    0 0 30px rgba(255, 0, 0, 0.3);
+            }
+            50% { 
+                transform: scale(1.05); 
+                box-shadow: 
+                    0 6px 30px rgba(255, 0, 0, 0.7),
+                    0 0 40px rgba(255, 0, 0, 0.5);
+            }
+            100% { 
+                transform: scale(1); 
+                box-shadow: 
+                    0 4px 20px rgba(255, 0, 0, 0.5),
+                    0 0 30px rgba(255, 0, 0, 0.3);
+            }
+        }
+        
+        .meta-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .meta-card {
+            background: linear-gradient(135deg, 
+                rgba(255, 0, 0, 0.1), 
+                rgba(255, 215, 0, 0.05));
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid var(--border-color);
+            box-shadow: 
+                0 4px 15px rgba(255, 0, 0, 0.2),
+                inset 0 0 20px rgba(0, 212, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .meta-card:hover {
+            border-color: var(--stark-gold);
+            box-shadow: 
+                0 6px 25px rgba(255, 215, 0, 0.3),
+                inset 0 0 25px rgba(0, 212, 255, 0.1);
+        }
+        
+        .meta-label {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9em;
+            color: var(--stark-gold);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 500;
+        }
+        
+        .meta-value {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--arc-blue);
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+        
+        /* STARK HUD STATISTICS CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, 
+                rgba(255, 0, 0, 0.08) 0%, 
+                rgba(255, 215, 0, 0.04) 50%,
+                rgba(0, 212, 255, 0.06) 100%);
+            backdrop-filter: blur(15px);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.3),
+                inset 0 0 30px rgba(255, 0, 0, 0.05);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--stark-gold);
+            box-shadow: 
+                0 15px 40px rgba(255, 215, 0, 0.3),
+                inset 0 0 40px rgba(0, 212, 255, 0.1);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                var(--stark-red), 
+                var(--stark-gold), 
+                var(--arc-blue));
+            animation: hud-scan 3s linear infinite;
+        }
+        
+        @keyframes hud-scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .stat-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: var(--stark-gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            animation: icon-glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes icon-glow {
+            0%, 100% { 
+                text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+                transform: scale(1);
+            }
+            50% { 
+                text-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+                transform: scale(1.1);
+            }
+        }
+        
+        .stat-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 3em;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: var(--arc-blue);
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.7);
+            letter-spacing: 2px;
+        }
+        
+        .stat-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1em;
+            color: var(--stark-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+        
+        /* Charts Container */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 25px;
+        }
+        
+        .chart-title {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Progress bars */
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            position: relative;
+            transition: width 1s ease;
+            animation: fillAnimation 1s ease forwards;
+        }
+        
+        @keyframes fillAnimation {
+            from { width: 0; }
+        }
+        
+        .progress-success {
+            background: linear-gradient(90deg, var(--success), #00CC6E);
+        }
+        
+        .progress-danger {
+            background: linear-gradient(90deg, var(--danger), #FF1744);
+        }
+        
+        /* AI Analysis Section */
+        .ai-section {
+            background: linear-gradient(135deg, rgba(94, 84, 142, 0.1), rgba(0, 212, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--accent-primary);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .ai-icon {
+            font-size: 2.5em;
+            color: var(--accent-primary);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .ai-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .ai-content {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .ai-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .ai-card-title {
+            font-size: 1.1em;
+            color: var(--accent-primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .ai-card-content {
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        /* Error Details */
+        .error-section {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .error-title {
+            color: var(--danger);
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .error-content {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            overflow-x: auto;
+            border-left: 4px solid var(--danger);
+        }
+        
+        /* Suggested Fixes */
+        .fixes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .fix-card {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), transparent);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            transition: transform 0.3s;
+        }
+        
+        .fix-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .fix-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--success);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            width: 45%;
+            position: relative;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-primary);
+            border: 3px solid var(--bg-primary);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        
+        /* Media Attachments */
+        .media-section {
+            margin-bottom: 30px;
+        }
+        
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .media-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .media-icon {
+            font-size: 3em;
+            color: var(--accent-primary);
+            margin-bottom: 10px;
+        }
+        
+        .media-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .media-link:hover {
+            color: var(--accent-secondary);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .footer-logo {
+            font-size: 1.5em;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-slide {
+            animation: slideIn 0.6s ease forwards;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-content {
+                width: calc(100% - 50px);
+                margin-left: 50px;
+            }
+            .timeline-dot {
+                left: 20px;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .particles {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- STARK INDUSTRIES Animated particles -->
+    <div class="stark-particles">
+        
+            <div class="stark-particle gold" style="
+                left: 53.862467617552035%;
+                top: 71.46142257120259%;
+                animation-delay: 2.563075472005198s;
+                animation-duration: 11.696402845401753s;
+            "></div>
+        
+            <div class="stark-particle " style="
+                left: 73.78222846474748%;
+                top: 70.75721065357585%;
+                animation-delay: 7.509598707958331s;
+                animation-duration: 10.412254520837855s;
+            "></div>
+        
+            <div class="stark-particle " style="
+                left: 35.995450776207115%;
+                top: 67.91691760095627%;
+                animation-delay: 2.6338879082365407s;
+                animation-duration: 13.831136370297802s;
+            "></div>
+        
+            <div class="stark-particle " style="
+                left: 79.93257199137346%;
+                top: 15.31153637427346%;
+                animation-delay: 7.276705754116733s;
+                animation-duration: 10.349016706955537s;
+            "></div>
+        
+            <div class="stark-particle " style="
+                left: 89.84758715261003%;
+                top: 47.30421951937753%;
+                animation-delay: 3.6163558238572815s;
+                animation-duration: 10.457750032216627s;
+            "></div>
+        
+            <div class="stark-particle gold" style="
+                left: 72.6984285144218%;
+                top: 41.04484686679143%;
+                animation-delay: 2.757959884735013s;
+                animation-duration: 10.706835438929016s;
+            "></div>
+        
+            <div class="stark-particle blue" style="
+                left: 85.51557223739457%;
+                top: 61.683375927287344%;
+                animation-delay: 5.235434414980948s;
+                animation-duration: 14.908336254729107s;
+            "></div>
+        
+            <div class="stark-particle gold" style="
+                left: 6.623213703952812%;
+                top: 62.391901561275255%;
+                animation-delay: 4.107006118187275s;
+                animation-duration: 10.309867307157688s;
+            "></div>
+        
+            <div class="stark-particle gold" style="
+                left: 40.04077922783974%;
+                top: 21.4984444274545%;
+                animation-delay: 7.866643586017513s;
+                animation-duration: 11.271583767740564s;
+            "></div>
+        
+            <div class="stark-particle gold" style="
+                left: 4.644347903454326%;
+                top: 93.17627606700367%;
+                animation-delay: 4.122343445225346s;
+                animation-duration: 14.008828774408855s;
+            "></div>
+        
+            <div class="stark-particle gold" style="
+                left: 90.46467108819843%;
+                top: 35.33411276912894%;
+                animation-delay: 2.4561786185240733s;
+                animation-duration: 12.088729436772962s;
+            "></div>
+        
+            <div class="stark-particle blue" style="
+                left: 89.99170556350889%;
+                top: 95.93690591287556%;
+                animation-delay: 3.6261314449447006s;
+                animation-duration: 11.665411491019894s;
+            "></div>
+        
+            <div class="stark-particle gold" style="
+                left: 1.9749647940833226%;
+                top: 23.53308682720264%;
+                animation-delay: 5.590255582682906s;
+                animation-duration: 12.176962840851896s;
+            "></div>
+        
+            <div class="stark-particle gold" style="
+                left: 99.9751701941716%;
+                top: 37.44353276373767%;
+                animation-delay: 3.150576371300411s;
+                animation-duration: 12.935114310351105s;
+            "></div>
+        
+            <div class="stark-particle blue" style="
+                left: 37.72214654064175%;
+                top: 43.621718571774124%;
+                animation-delay: 5.759450642262385s;
+                animation-duration: 10.760476554363358s;
+            "></div>
+        
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header animate-slide">
+            <div class="header-content">
+                <div class="stark-logo">STARK INDUSTRIES</div>
+                <div class="jarvis-logo">
+                    <svg width="60" height="60" viewBox="0 0 100 100" style="vertical-align: middle; margin-right: 15px;">
+                        <!-- Arc Reactor -->
+                        <defs>
+                            <!-- Gradient for the arc reactor glow -->
+                            <radialGradient id="reactorGlow">
+                                <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                                <stop offset="40%" style="stop-color:#00D4FF;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#0080FF;stop-opacity:0.8" />
+                            </radialGradient>
+                            <!-- Metal gradient -->
+                            <linearGradient id="metalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#4A5568;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#2D3748;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#1A202C;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        
+                        <g transform="translate(50, 50)">
+                            <!-- Outer ring -->
+                            <circle cx="0" cy="0" r="45" fill="url(#metalGradient)" stroke="#1A202C" stroke-width="2"/>
+                            <circle cx="0" cy="0" r="40" fill="none" stroke="#718096" stroke-width="1" opacity="0.5"/>
+                            
+                            <!-- Segmented ring sections -->
+                            <g>
+                                <!-- Create 10 segments -->
+                                <path d="M 0,-35 L 0,-30 A 30,30 0 0,1 28.5,-9.3 L 33.2,-10.8 A 35,35 0 0,0 0,-35 Z" fill="white" opacity="0.9"/>
+                                <path d="M 28.5,-9.3 L 33.2,-10.8 A 35,35 0 0,1 33.2,10.8 L 28.5,9.3 A 30,30 0 0,0 28.5,-9.3 Z" fill="#2D3748" opacity="0.7"/>
+                                <path d="M 33.2,10.8 L 28.5,9.3 A 30,30 0 0,1 17.6,24.3 L 20.5,28.3 A 35,35 0 0,0 33.2,10.8 Z" fill="white" opacity="0.9"/>
+                                <path d="M 20.5,28.3 L 17.6,24.3 A 30,30 0 0,1 -17.6,24.3 L -20.5,28.3 A 35,35 0 0,0 20.5,28.3 Z" fill="#2D3748" opacity="0.7"/>
+                                <path d="M -17.6,24.3 L -20.5,28.3 A 35,35 0 0,1 -33.2,10.8 L -28.5,9.3 A 30,30 0 0,0 -17.6,24.3 Z" fill="white" opacity="0.9"/>
+                                <path d="M -33.2,10.8 L -28.5,9.3 A 30,30 0 0,0 -28.5,-9.3 L -33.2,-10.8 A 35,35 0 0,1 -33.2,10.8 Z" fill="#2D3748" opacity="0.7"/>
+                                <path d="M -28.5,-9.3 L -33.2,-10.8 A 35,35 0 0,1 0,-35 L 0,-30 A 30,30 0 0,0 -28.5,-9.3 Z" fill="white" opacity="0.9"/>
+                            </g>
+                            
+                            <!-- Inner triangular core -->
+                            <g>
+                                <!-- Triangle background -->
+                                <path d="M 0,-20 L 17.3,10 L -17.3,10 Z" fill="#00A6FB" stroke="#00D4FF" stroke-width="2">
+                                    <animate attributeName="fill" values="#00A6FB;#00D4FF;#00A6FB" dur="2s" repeatCount="indefinite"/>
+                                </path>
+                                
+                                <!-- Inner triangle -->
+                                <path d="M 0,-15 L 13,7.5 L -13,7.5 Z" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.8"/>
+                                
+                                <!-- Center glow circle -->
+                                <circle cx="0" cy="0" r="8" fill="url(#reactorGlow)" opacity="0.9">
+                                    <animate attributeName="r" values="8;10;8" dur="1.5s" repeatCount="indefinite"/>
+                                </circle>
+                                
+                                <!-- Center bright core -->
+                                <circle cx="0" cy="0" r="4" fill="white" opacity="1">
+                                    <animate attributeName="opacity" values="1;0.7;1" dur="1s" repeatCount="indefinite"/>
+                                </circle>
+                            </g>
+                            
+                            <!-- Connection points (the 3 dots at triangle vertices) -->
+                            <circle cx="0" cy="-20" r="3" fill="white"/>
+                            <circle cx="17.3" cy="10" r="3" fill="white"/>
+                            <circle cx="-17.3" cy="10" r="3" fill="white"/>
+                            
+                            <!-- Rotating glow effect -->
+                            <circle cx="0" cy="0" r="38" fill="none" stroke="#00D4FF" stroke-width="0.5" opacity="0.3">
+                                <animate attributeName="stroke-width" values="0.5;2;0.5" dur="3s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite"/>
+                            </circle>
+                        </g>
+                    </svg>
+                    J.A.R.V.I.S ANALYSIS SYSTEM
+                </div>
+                <div class="stark-subtitle">Just A Rather Very Intelligent System</div>
+                <div class="test-name">Aeromodelling Program</div>
+                <div class="status-badge status-passed">
+                    <i class="fas fa-check-circle"></i> ALL SYSTEMS OPERATIONAL
+                </div>
+                <div class="meta-info">
+                    <div class="meta-card">
+                        <div class="meta-label">Timestamp</div>
+                        <div class="meta-value">18/8/2025, 7:16:28 pm</div>
+                    </div>
+                    <div class="meta-card">
+                        <div class="meta-label">Duration</div>
+                        <div class="meta-value">31.78</div>
+                    </div>
+                    <div class="meta-card">
+                        <div class="meta-label">Exit Code</div>
+                        <div class="meta-value">0</div>
+                    </div>
+                    <div class="meta-card">
+                        <div class="meta-label">Test Suite</div>
+                        <div class="meta-value">Cypress E2E</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid animate-slide">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: var(--info);">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stat-value">1</div>
+                <div class="stat-label">Total Tests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: var(--success);">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <div class="stat-value">1</div>
+                <div class="stat-label">Passed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: var(--danger);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">Failed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: var(--warning);">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-container animate-slide">
+            <div class="chart-card">
+                <div class="chart-title">
+                    <i class="fas fa-chart-pie"></i> Test Results Distribution
+                </div>
+                <!-- Single stacked bar showing true distribution -->
+                <div class="progress-bar" style="display: flex; overflow: hidden;">
+                    
+                    <div class="progress-fill progress-success" style="width: 100%; animation: none; border-radius: 15px;">
+                        1 Passed
+                    </div>
+                    
+                    
+                </div>
+                <!-- Percentage labels -->
+                <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.9em;">
+                    <div style="color: var(--success);">
+                        <i class="fas fa-check-circle"></i> 100% Passed
+                    </div>
+                    <div style="color: var(--danger);">
+                        <i class="fas fa-times-circle"></i> 0% Failed
+                    </div>
+                </div>
+                <!-- Visual pie chart using CSS -->
+                <div style="margin-top: 20px; display: flex; justify-content: center;">
+                    <div style="width: 150px; height: 150px; position: relative;">
+                        <svg viewBox="0 0 36 36" style="transform: rotate(-90deg);">
+                            <!-- Background circle -->
+                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none"
+                                stroke="rgba(255, 255, 255, 0.1)"
+                                stroke-width="2"
+                            />
+                            <!-- Passed segment -->
+                            
+                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none"
+                                stroke="#00FF88"
+                                stroke-width="2"
+                                stroke-dasharray="100 0"
+                                style="transition: stroke-dasharray 1s ease;"
+                            />
+                            
+                            <!-- Failed segment -->
+                            
+                        </svg>
+                        <!-- Center text -->
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                            <div style="font-size: 1.8em; font-weight: 700; color: var(--success);">
+                                100%
+                            </div>
+                            <div style="font-size: 0.8em; color: rgba(255,255,255,0.6);">Success</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Legend -->
+                <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px;">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <div style="width: 12px; height: 12px; background: var(--success); border-radius: 2px;"></div>
+                        <span style="font-size: 0.85em;">Passed (1)</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <div style="width: 12px; height: 12px; background: var(--danger); border-radius: 2px;"></div>
+                        <span style="font-size: 0.85em;">Failed (0)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">
+                    <i class="fas fa-clock"></i> Execution Timeline
+                </div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <strong>Test Started</strong><br>
+                            7:16:28 pm
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot" style="background: var(--success);"></div>
+                        <div class="timeline-content">
+                            <strong>Test Completed</strong><br>
+                            Duration: 31.78
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <!-- Success Message -->
+        <div class="ai-section animate-slide" style="border-color: var(--success);">
+            <div class="ai-header">
+                <div class="ai-icon" style="color: var(--success);">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="ai-title">Test Passed Successfully!</div>
+            </div>
+            <div class="ai-content">
+                <div class="ai-card">
+                    <div class="ai-card-content">
+                        All test cases executed successfully without any errors. The application is working as expected.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <!-- Media Attachments -->
+        <div class="media-section animate-slide">
+            <div class="ai-header">
+                <div class="ai-icon" style="color: var(--info);">
+                    <i class="fas fa-paperclip"></i>
+                </div>
+                <div class="ai-title">Attachments & Artifacts</div>
+            </div>
+            <div class="media-grid">
+                
+                <div class="media-card">
+                    <div class="media-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div class="media-link" style="color: var(--success);">
+                        <i class="fas fa-check-circle"></i> Video Recorded
+                    </div>
+                    <div style="font-size: 0.85em; margin-top: 10px; color: rgba(255,255,255,0.6);">
+                        cypress/videos/Aeromodelling Program.cy.js.mp4
+                    </div>
+                    <div style="margin-top: 10px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                        <strong>To view video:</strong><br>
+                        1. Open file explorer<br>
+                        2. Navigate to project folder<br>
+                        3. Open: cypress/videos/Aeromodelling Program.cy.js.mp4
+                    </div>
+                </div>
+                
+                
+                
+                <div class="media-card" style="opacity: 0.5;">
+                    <div class="media-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div style="color: var(--success);">
+                        <i class="fas fa-check-circle"></i> No Screenshots Needed
+                    </div>
+                    <div style="font-size: 0.85em; margin-top: 10px; color: rgba(255,255,255,0.4);">
+                        Test passed - no failure screenshots
+                    </div>
+                </div>
+                
+                
+                <div class="media-card">
+                    <div class="media-icon" style="color: var(--accent-primary);">
+                        <i class="fas fa-file-code"></i>
+                    </div>
+                    <a href="#full-output" class="media-link">
+                        <i class="fas fa-terminal"></i> View Full Output
+                    </a>
+                    <div style="font-size: 0.85em; margin-top: 10px; color: var(--success);">
+                        ✓ Click to expand below
+                    </div>
+                </div>
+                
+                <div class="media-card">
+                    <div class="media-icon" style="color: var(--warning);">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <div class="media-link" style="color: var(--warning);">
+                        <i class="fas fa-info-circle"></i> Project Artifacts
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.85em;">
+                        <div style="padding: 5px;">📁 /cypress/videos/</div>
+                        <div style="padding: 5px;">📁 /cypress/screenshots/</div>
+                        <div style="padding: 5px;">📁 /cypress/jarvis-reports/</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Full Output (Hidden by default) -->
+        <details id="full-output" style="margin-top: 30px;">
+            <summary style="cursor: pointer; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; color: var(--accent-primary);">
+                <i class="fas fa-terminal"></i> View Full Test Output
+            </summary>
+            <div class="error-content" style="margin-top: 10px;">
+                <pre>
+[dotenv@17.2.1] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+This project has been configured to record runs on our Cypress Cloud.
+
+It currently has the projectId: ovn7sm
+
+You also provided your Record Key, but you did not pass the --record flag.
+
+This run will not be recorded.
+
+If you meant to have this run recorded please additionally pass this flag:
+
+  $ cypress run --record
+
+https://on.cypress.io/recording-project-runs
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        14.5.3                                                                         │
+  │ Browser:        Electron 130                                                                   │
+  │ Node Version:   v24.5.0 (C:\Program Files\nodejs\node.exe)                                     │
+  │ Specs:          1 found (Aeromodelling Program.cy.js)                                          │
+  │ Searched:       C:\Users\LMES-LP-388\Documents\GitHub\automation-tests-v2\cypress\e2e\Chitti W │
+  │                 orkshop\Online workshop\Aeromodelling Program.cy.js                            │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  Aeromodelling Program.cy.js                                                     (1 of 1)
+Warning: The following browser launch options were provided but are not supported by electron
+
+ - args
+
+
+  Aeromodelling Program Test
+    √ should visit workshops page and verify content (18257ms)
+
+
+  1 passing (18s)
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      1                                                                                │
+  │ Failing:      0                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        true                                                                             │
+  │ Duration:     18 seconds                                                                       │
+  │ Spec Ran:     Aeromodelling Program.cy.js                                                      │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Video)
+
+  -  Video output: C:\Users\LMES-LP-388\Documents\GitHub\automation-tests-v2\cypress\videos\Aeromodelling Program.cy.js.mp4
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ √  Aeromodelling Program.cy.js              00:18        1        1        -        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    √  All specs passed!                        00:18        1        1        -        -        -  
+
+</pre>
+            </div>
+        </details>
+
+        <!-- STARK INDUSTRIES Footer -->
+        <div class="footer">
+            <div class="footer-logo">STARK INDUSTRIES</div>
+            <div style="font-family: 'Orbitron', monospace; font-size: 1.2em; color: var(--arc-blue); text-shadow: 0 0 10px var(--arc-blue);">J.A.R.V.I.S v3.0</div>
+            <div>Just A Rather Very Intelligent System</div>
+            <div style="margin-top: 15px; color: var(--stark-gold);">🔋 POWER LEVEL: 100% | 🛡️ SECURITY: OPTIMAL</div>
+            <div style="margin-top: 10px;">Report Generated: 18/8/2025, 7:16:28 pm</div>
+            <div style="margin-top: 5px; font-size: 0.9em; opacity: 0.7;">© Stark Industries - Advanced Testing Division</div>
+        </div>
+    </div>
+
+    <script>
+        // STARK INDUSTRIES - IRON MAN Interactive Effects
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Arc Reactor power-up effect on load
+            setTimeout(() => {
+                const arcCenter = document.querySelector('.arc-center');
+                if (arcCenter) {
+                    arcCenter.style.animation = 'arc-core-glow 1s ease-in-out infinite';
+                }
+            }, 500);
+            
+            // Repulsor beam effects on stat card hover
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                    this.style.boxShadow = '0 15px 40px rgba(255, 215, 0, 0.4), inset 0 0 40px rgba(0, 212, 255, 0.15)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                    this.style.boxShadow = '';
+                });
+            });
+            
+            // JARVIS startup sound effect (visual feedback)
+            console.log('%c⚡ STARK INDUSTRIES SYSTEM ONLINE ⚡', 'background: linear-gradient(90deg, #FF0000, #FFD700); color: white; padding: 10px 20px; font-size: 16px; font-weight: bold;');
+            console.log('%cJ.A.R.V.I.S Analysis System v3.0 - All systems operational', 'color: #00D4FF; font-size: 12px;');
+            // Animate stat cards on scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = 'slideIn 0.6s ease forwards';
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.stat-card, .ai-card, .fix-card').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Add click-to-copy for error messages
+            document.querySelectorAll('.error-content').forEach(el => {
+                el.style.cursor = 'pointer';
+                el.title = 'Click to copy';
+                el.addEventListener('click', function() {
+                    const text = this.innerText;
+                    navigator.clipboard.writeText(text).then(() => {
+                        const originalBg = this.style.background;
+                        this.style.background = 'rgba(0, 255, 136, 0.1)';
+                        setTimeout(() => {
+                            this.style.background = originalBg;
+                        }, 300);
+                    });
+                });
+            });
+            
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+    

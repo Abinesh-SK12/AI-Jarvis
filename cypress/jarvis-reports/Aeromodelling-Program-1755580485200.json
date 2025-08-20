@@ -1,0 +1,50 @@
+{
+  "testName": "Aeromodelling Program",
+  "timestamp": "2025-08-19T05:14:45.200Z",
+  "duration": "28.29",
+  "status": "FAILED",
+  "exitCode": 1,
+  "summary": {
+    "total": 1,
+    "passed": 0,
+    "failed": 1
+  },
+  "videoPath": "cypress/videos/Aeromodelling Program.cy.js.mp4",
+  "videoExists": true,
+  "screenshots": [
+    {
+      "name": "Aeromodelling Program Test -- should find the correct workshop card and register successfully (failed).png",
+      "path": "C:\\Users\\LMES-LP-388\\Documents\\GitHub\\automation-tests-v2\\cypress\\screenshots\\Aeromodelling Program.cy.js\\Aeromodelling Program Test -- should find the correct workshop card and register successfully (failed).png",
+      "relativePath": "cypress/screenshots/Aeromodelling Program.cy.js/Aeromodelling Program Test -- should find the correct workshop card and register successfully (failed).png"
+    },
+    {
+      "name": "failed-should find the correct workshop card and register successfully.png",
+      "path": "C:\\Users\\LMES-LP-388\\Documents\\GitHub\\automation-tests-v2\\cypress\\screenshots\\Aeromodelling Program.cy.js\\failed-should find the correct workshop card and register successfully.png",
+      "relativePath": "cypress/screenshots/Aeromodelling Program.cy.js/failed-should find the correct workshop card and register successfully.png"
+    }
+  ],
+  "screenshotPath": "C:\\Users\\LMES-LP-388\\Documents\\GitHub\\automation-tests-v2\\cypress\\screenshots\\Aeromodelling Program.cy.js",
+  "errorDetails": "Multiple errors occurred:\n1. Timed out retrying after 10000ms: Expected to find element: `undefined`, but never found it.\n2. Expected to find element: `undefined`, but never found it.\n3. `undefined`",
+  "failureReason": "\n\n  1) Aeromodelling Program Test\n       should find the correct workshop card and register successfully:\n     AssertionError: Timed out retrying after 10000ms: Expected to find element: `undefined`, but never found it.\n      at Context.eval (webpack://cypress-ai-debug-assistant/./cypress/e2e/Chitti Workshop/Online workshop/Aeromodelling Program.cy.js:24:26)\n      at getRet (https://chitti.app/__cypress/runner/cypress_runner.js:120949:20)\n      at tryCatcher (https://chitti.app/__cypress/runner/cypress_runner.js:1777:23)\n      at Promise.attempt.Promise.try (https://chitti.app/__cypress/runner/cypress_runner.js:4285:29)\n      at Context.thenFn (https://chitti.app/__cypress/runner/cypress_runner.js:120960:66)\n      at Context.then (https://chitti.app/__cypress/runner/cypress_runner.js:121211:21)\n      at wrapped (https://chitti.app/__cypress/runner/cypress_runner.js:141532:19)\n\n\n\n\n  (Results)\n\n  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐\n  │ Tests:        1                                                                                │",
+  "aiAnalysis": {
+    "errorType": "⏰ Website Too Slow",
+    "explanation": "",
+    "naturalLanguageFix": "",
+    "specificExplanation": "The test was waiting for something but it took too long (more than the allowed time limit). This means either:\n• The website is loading very slowly\n• something is not appearing on the page\n• There might be a network connection issue",
+    "targetedSolution": "To fix this timeout issue:\n• First, manually open the website and check if something appears normally\n• If it's slow, wait a bit and try the test again\n• If something never appears, check if the website has changed\n• Ask a developer to increase the timeout setting if the website is consistently slow",
+    "confidence": 0.85
+  },
+  "suggestedFixes": [
+    "Increase timeout value in cypress.config.js",
+    "Add cy.wait() before the failing command",
+    "Check if the element is loaded dynamically",
+    "Verify network requests are completing"
+  ],
+  "debugSteps": [
+    "Check browser console for JavaScript errors",
+    "Verify API endpoints are responding",
+    "Review network tab for failed requests",
+    "Check if element exists in DOM but is hidden"
+  ],
+  "fullOutput": "\r\n[dotenv@17.2.1] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }\nThis project has been configured to record runs on our Cypress Cloud.\n\nIt currently has the projectId: ovn7sm\n\nYou also provided your Record Key, but you did not pass the --record flag.\n\nThis run will not be recorded.\n\nIf you meant to have this run recorded please additionally pass this flag:\n\n  $ cypress run --record\n\nhttps://on.cypress.io/recording-project-runs\n\n====================================================================================================\n\n  (Run Starting)\n\n  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐\n  │ Cypress:        14.5.3                                                                         │\n  │ Browser:        Electron 130                                                                   │\n  │ Node Version:   v24.5.0 (C:\\Program Files\\nodejs\\node.exe)                                     │\n  │ Specs:          1 found (Aeromodelling Program.cy.js)                                          │\n  │ Searched:       C:\\Users\\LMES-LP-388\\Documents\\GitHub\\automation-tests-v2\\cypress\\e2e\\Chitti W │\n  │                 orkshop\\Online workshop\\Aeromodelling Program.cy.js                            │\n  └────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n\n────────────────────────────────────────────────────────────────────────────────────────────────────\n                                                                                                    \n  Running:  Aeromodelling Program.cy.js                                                     (1 of 1)\nWarning: The following browser launch options were provided but are not supported by electron\n\n - args\n\n\n  Aeromodelling Program Test\n    1) should find the correct workshop card and register successfully\n\n\n  0 passing (16s)\n  1 failing\n\n  1) Aeromodelling Program Test\n       should find the correct workshop card and register successfully:\n     AssertionError: Timed out retrying after 10000ms: Expected to find element: `undefined`, but never found it.\n      at Context.eval (webpack://cypress-ai-debug-assistant/./cypress/e2e/Chitti Workshop/Online workshop/Aeromodelling Program.cy.js:24:26)\n      at getRet (https://chitti.app/__cypress/runner/cypress_runner.js:120949:20)\n      at tryCatcher (https://chitti.app/__cypress/runner/cypress_runner.js:1777:23)\n      at Promise.attempt.Promise.try (https://chitti.app/__cypress/runner/cypress_runner.js:4285:29)\n      at Context.thenFn (https://chitti.app/__cypress/runner/cypress_runner.js:120960:66)\n      at Context.then (https://chitti.app/__cypress/runner/cypress_runner.js:121211:21)\n      at wrapped (https://chitti.app/__cypress/runner/cypress_runner.js:141532:19)\n\n\n\n\n  (Results)\n\n  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐\n  │ Tests:        1                                                                                │\n  │ Passing:      0                                                                                │\n  │ Failing:      1                                                                                │\n  │ Pending:      0                                                                                │\n  │ Skipped:      0                                                                                │\n  │ Screenshots:  2                                                                                │\n  │ Video:        true                                                                             │\n  │ Duration:     15 seconds                                                                       │\n  │ Spec Ran:     Aeromodelling Program.cy.js                                                      │\n  └────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n\n  (Screenshots)\n\n  -  C:\\Users\\LMES-LP-388\\Documents\\GitHub\\automation-tests-v2\\cypress\\screenshots\\Ae     (1920x959)\n     romodelling Program.cy.js\\Aeromodelling Program Test -- should find the correct                \n     workshop card and register successfully (failed).png                                           \n  -  C:\\Users\\LMES-LP-388\\Documents\\GitHub\\automation-tests-v2\\cypress\\screenshots\\Ae     (1600x900)\n     romodelling Program.cy.js\\failed-should find the correct workshop card and regis               \n     ter successfully.png                                                                           \n\n\n  (Video)\n\n  -  Video output: C:\\Users\\LMES-LP-388\\Documents\\GitHub\\automation-tests-v2\\cypress\\videos\\Aeromodelling Program.cy.js.mp4\n\n\n====================================================================================================\n\n  (Run Finished)\n\n\n       Spec                                              Tests  Passing  Failing  Pending  Skipped  \n  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐\n  │ ×  Aeromodelling Program.cy.js              00:15        1        -        1        -        - │\n  └────────────────────────────────────────────────────────────────────────────────────────────────┘\n    ×  1 of 1 failed (100%)                     00:15        1        -        1        -        -  \n\n"
+}

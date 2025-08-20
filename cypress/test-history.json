@@ -1,0 +1,108 @@
+{
+  "should find the correct workshop card and click it": [
+    {
+      "timestamp": "2025-08-11T12:12:10.039Z",
+      "status": "failed",
+      "duration": 12140
+    },
+    {
+      "timestamp": "2025-08-11T12:12:29.846Z",
+      "status": "failed",
+      "duration": 12919
+    },
+    {
+      "timestamp": "2025-08-11T12:12:52.513Z",
+      "status": "failed",
+      "duration": 14317
+    },
+    {
+      "timestamp": "2025-08-11T12:13:14.261Z",
+      "status": "failed",
+      "duration": 13710
+    },
+    {
+      "timestamp": "2025-08-11T12:13:35.198Z",
+      "status": "failed",
+      "duration": 14204
+    },
+    {
+      "timestamp": "2025-08-11T12:14:26.425Z",
+      "status": "failed",
+      "duration": 11158
+    },
+    {
+      "timestamp": "2025-08-11T12:15:23.248Z",
+      "status": "failed",
+      "duration": 10936
+    },
+    {
+      "timestamp": "2025-08-11T12:15:41.205Z",
+      "status": "failed",
+      "duration": 11130
+    },
+    {
+      "timestamp": "2025-08-11T12:16:01.431Z",
+      "status": "failed",
+      "duration": 12947
+    },
+    {
+      "timestamp": "2025-08-11T12:16:39.578Z",
+      "status": "failed",
+      "duration": 11675
+    }
+  ],
+  "should find the correct workshop card and register with AI assistance": [
+    {
+      "timestamp": "2025-08-11T12:11:09.697Z",
+      "status": "failed",
+      "duration": 20841
+    }
+  ],
+  "An uncaught error was detected outside of a test": [
+    {
+      "timestamp": "2025-08-11T12:11:51.038Z",
+      "status": "failed",
+      "duration": 182
+    }
+  ],
+  "Redirecting on same tab": [
+    {
+      "timestamp": "2025-08-11T12:13:52.438Z",
+      "status": "failed",
+      "duration": 8941
+    }
+  ],
+  "Learning": [
+    {
+      "timestamp": "2025-08-11T12:14:08.411Z",
+      "status": "failed",
+      "duration": 7530
+    }
+  ],
+  "should register for the Scientific Parenting Workshop": [
+    {
+      "timestamp": "2025-08-11T12:14:48.222Z",
+      "status": "failed",
+      "duration": 12511
+    }
+  ],
+  "should log in with valid credentials": [
+    {
+      "timestamp": "2025-08-11T12:15:05.175Z",
+      "status": "failed",
+      "duration": 10203
+    },
+    {
+      "timestamp": "2025-08-11T12:16:20.873Z",
+      "status": "failed",
+      "duration": 12395
+    }
+  ],
+  "Electronics 1 on 1": [
+    {
+      "timestamp": "2025-08-11T12:17:35.220Z",
+      "status": "failed",
+      "duration": 17270
+    }
+  ]
+}
