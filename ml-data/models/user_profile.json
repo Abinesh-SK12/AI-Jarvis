@@ -1,0 +1,35 @@
+{
+  "preferences": {
+    "verbosity": "normal",
+    "voiceEnabled": true,
+    "preferredCommands": [
+      {
+        "command": "ml-insights",
+        "frequency": 3
+      },
+      {
+        "command": "ml-toggle",
+        "frequency": 1
+      },
+      {
+        "command": "ml-learn",
+        "frequency": 1
+      },
+      {
+        "command": "status",
+        "frequency": 1
+      },
+      {
+        "command": "help",
+        "frequency": 1
+      }
+    ],
+    "timePatterns": {}
+  },
+  "behavior": {
+    "avgSessionLength": 0,
+    "commonWorkflows": [],
+    "errorPatterns": {},
+    "successRate": 1
+  }
+}

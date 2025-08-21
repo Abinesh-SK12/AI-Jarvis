@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-08-21T09:54:09.078Z",
+  "command": "ml-insights",
+  "success": true,
+  "executionTime": 5,
+  "context": {
+    "args": null,
+    "voiceInput": false
+  },
+  "hour": 15,
+  "dayOfWeek": 4
+}

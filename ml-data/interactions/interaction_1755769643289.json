@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-08-21T09:47:23.288Z",
+  "command": "ml-learn",
+  "success": true,
+  "executionTime": 7,
+  "context": {
+    "args": null,
+    "voiceInput": false
+  },
+  "hour": 15,
+  "dayOfWeek": 4
+}

@@ -206,6 +206,408 @@ const gameMode = {
     }
 };
 
+// Machine Learning Engine for continuous improvement
+const mlEngine = {
+    enabled: true,
+    dataPath: path.join(__dirname, 'ml-data'),
+    modelsPath: path.join(__dirname, 'ml-data', 'models'),
+    interactionsPath: path.join(__dirname, 'ml-data', 'interactions'),
+    
+    // Learning data structures
+    commandPatterns: {},
+    userProfile: {
+        preferences: {
+            verbosity: 'normal',
+            voiceEnabled: true,
+            preferredCommands: [],
+            timePatterns: {}
+        },
+        behavior: {
+            avgSessionLength: 0,
+            commonWorkflows: [],
+            errorPatterns: {},
+            successRate: 1.0
+        }
+    },
+    
+    // Learning parameters
+    learningRate: 0.01,
+    confidenceThreshold: 0.75,
+    minSampleSize: 10,
+    
+    // Current session data
+    sessionData: {
+        startTime: Date.now(),
+        commands: [],
+        errors: [],
+        successes: [],
+        interactions: []
+    },
+    
+    // Initialize ML directories
+    initialize: function() {
+        [this.dataPath, this.modelsPath, this.interactionsPath].forEach(dir => {
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+        });
+        this.loadModels();
+    },
+    
+    // Record user interaction for learning
+    recordInteraction: function(command, success = true, executionTime = 0, context = {}) {
+        const interaction = {
+            timestamp: new Date().toISOString(),
+            command,
+            success,
+            executionTime,
+            context,
+            hour: new Date().getHours(),
+            dayOfWeek: new Date().getDay()
+        };
+        
+        this.sessionData.interactions.push(interaction);
+        this.updatePatterns(interaction);
+        
+        // Save interaction to file
+        const filename = `interaction_${Date.now()}.json`;
+        fs.writeFileSync(
+            path.join(this.interactionsPath, filename),
+            JSON.stringify(interaction, null, 2)
+        );
+        
+        // Trigger learning if enough data
+        if (this.sessionData.interactions.length % 20 === 0) {
+            this.learn();
+        }
+    },
+    
+    // Update command patterns
+    updatePatterns: function(interaction) {
+        const cmd = interaction.command;
+        
+        if (!this.commandPatterns[cmd]) {
+            this.commandPatterns[cmd] = {
+                frequency: 0,
+                avgExecutionTime: 0,
+                successRate: 1,
+                timePreference: {},
+                nextCommands: {}
+            };
+        }
+        
+        const pattern = this.commandPatterns[cmd];
+        pattern.frequency++;
+        
+        // Update execution time average
+        pattern.avgExecutionTime = 
+            (pattern.avgExecutionTime * (pattern.frequency - 1) + interaction.executionTime) / 
+            pattern.frequency;
+        
+        // Update success rate
+        pattern.successRate = 
+            ((pattern.successRate * (pattern.frequency - 1)) + (interaction.success ? 1 : 0)) / 
+            pattern.frequency;
+        
+        // Track time preferences
+        const timeSlot = this.getTimeSlot(interaction.hour);
+        pattern.timePreference[timeSlot] = (pattern.timePreference[timeSlot] || 0) + 1;
+        
+        // Track command sequences
+        const prevCommand = this.sessionData.commands[this.sessionData.commands.length - 2];
+        if (prevCommand) {
+            if (!this.commandPatterns[prevCommand].nextCommands) {
+                this.commandPatterns[prevCommand].nextCommands = {};
+            }
+            this.commandPatterns[prevCommand].nextCommands[cmd] = 
+                (this.commandPatterns[prevCommand].nextCommands[cmd] || 0) + 1;
+        }
+        
+        this.sessionData.commands.push(cmd);
+        this.saveModels();
+    },
+    
+    // Learn from accumulated data
+    learn: function() {
+        console.log(`${colors.cyan}[ML] Learning from ${this.sessionData.interactions.length} interactions...${colors.reset}`);
+        
+        // Identify patterns
+        const patterns = this.identifyPatterns();
+        
+        // Update user profile
+        this.updateUserProfile(patterns);
+        
+        // Save updated models
+        this.saveModels();
+    },
+    
+    // Identify patterns in user behavior
+    identifyPatterns: function() {
+        const patterns = {
+            frequentCommands: [],
+            commandSequences: [],
+            timeBasedUsage: {},
+            errorPatterns: []
+        };
+        
+        // Find frequent commands
+        patterns.frequentCommands = Object.entries(this.commandPatterns)
+            .sort((a, b) => b[1].frequency - a[1].frequency)
+            .slice(0, 5)
+            .map(([cmd, data]) => ({ command: cmd, frequency: data.frequency }));
+        
+        // Find command sequences
+        Object.entries(this.commandPatterns).forEach(([cmd, data]) => {
+            if (data.nextCommands) {
+                Object.entries(data.nextCommands).forEach(([nextCmd, freq]) => {
+                    if (freq > 2) {
+                        patterns.commandSequences.push({
+                            first: cmd,
+                            second: nextCmd,
+                            frequency: freq
+                        });
+                    }
+                });
+            }
+        });
+        
+        return patterns;
+    },
+    
+    // Update user profile based on patterns
+    updateUserProfile: function(patterns) {
+        // Update preferred commands
+        this.userProfile.preferences.preferredCommands = patterns.frequentCommands;
+        
+        // Update common workflows
+        this.userProfile.behavior.commonWorkflows = patterns.commandSequences
+            .sort((a, b) => b.frequency - a.frequency)
+            .slice(0, 5);
+        
+        // Calculate overall success rate
+        let totalCommands = 0;
+        let successfulCommands = 0;
+        
+        Object.values(this.commandPatterns).forEach(pattern => {
+            totalCommands += pattern.frequency;
+            successfulCommands += pattern.frequency * pattern.successRate;
+        });
+        
+        this.userProfile.behavior.successRate = 
+            totalCommands > 0 ? successfulCommands / totalCommands : 1;
+    },
+    
+    // Predict next likely command
+    predictNextCommand: function(currentCommand) {
+        if (!this.commandPatterns[currentCommand] || !this.commandPatterns[currentCommand].nextCommands) {
+            return null;
+        }
+        
+        const nextCommands = this.commandPatterns[currentCommand].nextCommands;
+        const sortedCommands = Object.entries(nextCommands)
+            .sort((a, b) => b[1] - a[1]);
+        
+        if (sortedCommands.length > 0 && sortedCommands[0][1] > 2) {
+            return {
+                command: sortedCommands[0][0],
+                confidence: sortedCommands[0][1] / this.commandPatterns[currentCommand].frequency
+            };
+        }
+        
+        return null;
+    },
+    
+    // Suggest optimizations
+    suggestOptimizations: function() {
+        const suggestions = [];
+        
+        // Suggest shortcuts for frequent commands
+        this.userProfile.preferences.preferredCommands.forEach(({ command, frequency }) => {
+            if (frequency > 10) {
+                suggestions.push({
+                    type: 'shortcut',
+                    message: `Consider creating an alias for "${command}" (used ${frequency} times)`
+                });
+            }
+        });
+        
+        // Suggest workflow automation
+        this.userProfile.behavior.commonWorkflows.forEach(workflow => {
+            if (workflow.frequency > 5) {
+                suggestions.push({
+                    type: 'automation',
+                    message: `Automate sequence: ${workflow.first} → ${workflow.second} (done ${workflow.frequency} times)`
+                });
+            }
+        });
+        
+        return suggestions;
+    },
+    
+    // Helper methods
+    getTimeSlot: function(hour) {
+        if (hour >= 6 && hour < 12) return 'morning';
+        if (hour >= 12 && hour < 17) return 'afternoon';
+        if (hour >= 17 && hour < 22) return 'evening';
+        return 'night';
+    },
+    
+    // Save models to disk
+    saveModels: function() {
+        fs.writeFileSync(
+            path.join(this.modelsPath, 'command_patterns.json'),
+            JSON.stringify(this.commandPatterns, null, 2)
+        );
+        
+        fs.writeFileSync(
+            path.join(this.modelsPath, 'user_profile.json'),
+            JSON.stringify(this.userProfile, null, 2)
+        );
+    },
+    
+    // Load models from disk
+    loadModels: function() {
+        const patternsPath = path.join(this.modelsPath, 'command_patterns.json');
+        const profilePath = path.join(this.modelsPath, 'user_profile.json');
+        
+        if (fs.existsSync(patternsPath)) {
+            try {
+                this.commandPatterns = JSON.parse(fs.readFileSync(patternsPath, 'utf8'));
+            } catch (e) {
+                console.log(`${colors.dim}[ML] No previous patterns found${colors.reset}`);
+            }
+        }
+        
+        if (fs.existsSync(profilePath)) {
+            try {
+                this.userProfile = JSON.parse(fs.readFileSync(profilePath, 'utf8'));
+            } catch (e) {
+                console.log(`${colors.dim}[ML] No user profile found${colors.reset}`);
+            }
+        }
+    },
+    
+    // Get learning insights
+    getInsights: function() {
+        const totalInteractions = this.sessionData.interactions.length;
+        const successRate = this.userProfile.behavior.successRate;
+        const topCommands = this.userProfile.preferences.preferredCommands.slice(0, 3);
+        const suggestions = this.suggestOptimizations();
+        
+        return {
+            totalInteractions,
+            successRate: `${(successRate * 100).toFixed(1)}%`,
+            topCommands,
+            suggestions,
+            improvementRate: this.calculateImprovementRate()
+        };
+    },
+    
+    // Calculate improvement rate
+    calculateImprovementRate: function() {
+        if (this.sessionData.interactions.length < 20) return 0;
+        
+        const recent = this.sessionData.interactions.slice(-10);
+        const older = this.sessionData.interactions.slice(-20, -10);
+        
+        const recentSuccess = recent.filter(i => i.success).length / recent.length;
+        const olderSuccess = older.filter(i => i.success).length / older.length;
+        
+        return ((recentSuccess - olderSuccess) / (olderSuccess || 1)) * 100;
+    },
+    
+    // Personalize responses based on user profile
+    personalizeResponse: function(baseResponse, context = {}) {
+        // Add personalized greetings based on time patterns
+        const hour = new Date().getHours();
+        const timeSlot = this.getTimeSlot(hour);
+        
+        // Check if user frequently uses commands at this time
+        const timePatterns = this.userProfile.preferences.timePatterns[timeSlot];
+        if (timePatterns && this.sessionData.interactions.length === 1) {
+            const greeting = {
+                morning: 'Good morning, sir. Ready for your morning routine?',
+                afternoon: 'Good afternoon, sir. How may I assist you today?',
+                evening: 'Good evening, sir. Working late again?',
+                night: 'Still up, sir? I hope you are getting adequate rest.'
+            };
+            
+            if (greeting[timeSlot]) {
+                speak(greeting[timeSlot], null, 'low');
+            }
+        }
+        
+        return baseResponse;
+    },
+    
+    // Get personalized suggestions
+    getPersonalizedSuggestions: function() {
+        const suggestions = [];
+        const hour = new Date().getHours();
+        const timeSlot = this.getTimeSlot(hour);
+        
+        // Suggest commands based on time patterns
+        if (this.userProfile.preferences.preferredCommands.length > 0) {
+            const topCommand = this.userProfile.preferences.preferredCommands[0];
+            if (topCommand.frequency > 5) {
+                suggestions.push(`Try '${topCommand.command}' - your most used command`);
+            }
+        }
+        
+        // Suggest based on workflows
+        if (this.userProfile.behavior.commonWorkflows.length > 0) {
+            const workflow = this.userProfile.behavior.commonWorkflows[0];
+            suggestions.push(`Workflow suggestion: ${workflow.first} → ${workflow.second}`);
+        }
+        
+        return suggestions;
+    },
+    
+    // Adaptive learning - adjust parameters based on user behavior
+    adaptToUser: function() {
+        // Adjust verbosity based on interaction patterns
+        const avgInteractionTime = this.sessionData.interactions
+            .reduce((sum, i) => sum + (i.executionTime || 0), 0) / 
+            (this.sessionData.interactions.length || 1);
+        
+        // If user consistently uses quick commands, reduce verbosity
+        if (avgInteractionTime < 1000 && this.sessionData.interactions.length > 10) {
+            this.userProfile.preferences.verbosity = 'minimal';
+        }
+        
+        // Learn from error patterns
+        const errors = this.sessionData.interactions.filter(i => !i.success);
+        if (errors.length > 0) {
+            errors.forEach(error => {
+                const errorKey = error.context.error || 'unknown';
+                this.userProfile.behavior.errorPatterns[errorKey] = 
+                    (this.userProfile.behavior.errorPatterns[errorKey] || 0) + 1;
+            });
+        }
+    }
+};
+
+// Initialize ML engine
+mlEngine.initialize();
+
+// Set up periodic learning cycles for continuous improvement
+setInterval(() => {
+    if (mlEngine.enabled && mlEngine.sessionData.interactions.length > 0) {
+        // Perform periodic learning
+        mlEngine.learn();
+        mlEngine.adaptToUser();
+        
+        // Save progress
+        mlEngine.saveModels();
+        
+        // Show subtle notification if improvements detected
+        const improvementRate = mlEngine.calculateImprovementRate();
+        if (improvementRate > 10) {
+            console.log(`${colors.dim}[ML] Learning cycle complete. Efficiency improved by ${improvementRate.toFixed(1)}%${colors.reset}`);
+        }
+    }
+}, 300000); // Run every 5 minutes
+
 // Load saved game progress
 function loadGameProgress() {
     const saveFile = path.join(__dirname, 'jarvis-game-save.json');
@@ -3411,6 +3813,12 @@ const commands = {
             console.log(`${colors.cyan}║${colors.reset}                     │ ${colors.green}exit${colors.reset}                 │ Exit JARVIS                            ${colors.cyan}║${colors.reset}`);
             console.log(`${colors.cyan}╠═════════════════════╪══════════════════════╪════════════════════════════════════════╣${colors.reset}`);
             
+            console.log(`${colors.cyan}║${colors.bright} MACHINE LEARNING    ${colors.cyan}│                      │                                        ║${colors.reset}`);
+            console.log(`${colors.cyan}║${colors.reset}                     │ ${colors.green}ml-insights${colors.reset}          │ View ML learning insights & suggestions${colors.cyan}║${colors.reset}`);
+            console.log(`${colors.cyan}║${colors.reset}                     │ ${colors.green}ml-toggle${colors.reset}            │ Toggle machine learning on/off         ${colors.cyan}║${colors.reset}`);
+            console.log(`${colors.cyan}║${colors.reset}                     │ ${colors.green}ml-learn${colors.reset}             │ Trigger immediate learning cycle       ${colors.cyan}║${colors.reset}`);
+            console.log(`${colors.cyan}╠═════════════════════╪══════════════════════╪════════════════════════════════════════╣${colors.reset}`);
+            
             console.log(`${colors.cyan}║${colors.bright} VOICE CONTROLS      ${colors.cyan}│                      │                                        ║${colors.reset}`);
             console.log(`${colors.cyan}║${colors.reset}                     │ ${colors.green}voice${colors.reset}                │ Toggle voice output on/off             ${colors.cyan}║${colors.reset}`);
             console.log(`${colors.cyan}║${colors.reset}                     │ ${colors.green}voice-stop${colors.reset}           │ Stop current speech & clear queue      ${colors.cyan}║${colors.reset}`);
@@ -4291,6 +4699,73 @@ const commands = {
             console.log(`${colors.cyan}║${colors.reset} Reward: ${colors.green}+${dc.reward.xp} XP, +${dc.reward.coins} coins${colors.reset}`);
             console.log(`${colors.cyan}║${colors.reset} Expires: ${new Date(dc.expiresAt).toLocaleTimeString()}`);
             console.log(`${colors.cyan}╚════════════════════════════════════════════════════════════╝${colors.reset}`);
+        }
+    },
+    'ml-insights': {
+        description: 'View ML learning insights and suggestions',
+        action: () => {
+            console.log(`\n${colors.cyan}╔════════════════════════════════════════════════════════════════════════════════╗${colors.reset}`);
+            console.log(`${colors.cyan}║                           🧠 MACHINE LEARNING INSIGHTS                          ║${colors.reset}`);
+            console.log(`${colors.cyan}╠════════════════════════════════════════════════════════════════════════════════╣${colors.reset}`);
+            
+            const insights = mlEngine.getInsights();
+            
+            console.log(`${colors.cyan}║${colors.reset} ${colors.bright}Session Statistics:${colors.reset}`);
+            console.log(`${colors.cyan}║${colors.reset}   • Total Interactions: ${colors.green}${insights.totalInteractions}${colors.reset}`);
+            console.log(`${colors.cyan}║${colors.reset}   • Success Rate: ${colors.green}${insights.successRate}${colors.reset}`);
+            console.log(`${colors.cyan}║${colors.reset}   • Improvement Rate: ${insights.improvementRate > 0 ? colors.green : colors.yellow}${insights.improvementRate.toFixed(1)}%${colors.reset}`);
+            
+            if (insights.topCommands.length > 0) {
+                console.log(`${colors.cyan}║${colors.reset}`);
+                console.log(`${colors.cyan}║${colors.reset} ${colors.bright}Your Top Commands:${colors.reset}`);
+                insights.topCommands.forEach((cmd, i) => {
+                    console.log(`${colors.cyan}║${colors.reset}   ${i + 1}. ${colors.green}${cmd.command}${colors.reset} (used ${cmd.frequency} times)`);
+                });
+            }
+            
+            if (insights.suggestions.length > 0) {
+                console.log(`${colors.cyan}║${colors.reset}`);
+                console.log(`${colors.cyan}║${colors.reset} ${colors.bright}Optimization Suggestions:${colors.reset}`);
+                insights.suggestions.forEach((suggestion, i) => {
+                    console.log(`${colors.cyan}║${colors.reset}   ${colors.yellow}💡${colors.reset} ${suggestion.message}`);
+                });
+            }
+            
+            // Show common workflows
+            const workflows = mlEngine.userProfile.behavior.commonWorkflows;
+            if (workflows && workflows.length > 0) {
+                console.log(`${colors.cyan}║${colors.reset}`);
+                console.log(`${colors.cyan}║${colors.reset} ${colors.bright}Your Common Workflows:${colors.reset}`);
+                workflows.slice(0, 3).forEach(workflow => {
+                    console.log(`${colors.cyan}║${colors.reset}   ${colors.green}${workflow.first}${colors.reset} → ${colors.green}${workflow.second}${colors.reset} (${workflow.frequency} times)`);
+                });
+            }
+            
+            console.log(`${colors.cyan}╚════════════════════════════════════════════════════════════════════════════════╝${colors.reset}`);
+            
+            speak('Machine learning insights displayed, sir.');
+        }
+    },
+    'ml-toggle': {
+        description: 'Toggle ML learning on/off',
+        action: () => {
+            mlEngine.enabled = !mlEngine.enabled;
+            console.log(`\n${colors.yellow}[JARVIS]${colors.reset} Machine Learning ${mlEngine.enabled ? colors.green + 'ENABLED' : colors.red + 'DISABLED'}${colors.reset}`);
+            speak(`Machine learning ${mlEngine.enabled ? 'enabled' : 'disabled'}, sir.`);
+        }
+    },
+    'ml-learn': {
+        description: 'Trigger immediate ML learning cycle',
+        action: () => {
+            console.log(`\n${colors.yellow}[JARVIS]${colors.reset} Initiating learning cycle...`);
+            mlEngine.learn();
+            console.log(`${colors.green}✅ Learning cycle complete!${colors.reset}`);
+            
+            // Show brief insights
+            const insights = mlEngine.getInsights();
+            console.log(`${colors.dim}Success rate: ${insights.successRate} | Improvement: ${insights.improvementRate.toFixed(1)}%${colors.reset}`);
+            
+            speak('Learning cycle complete, sir. I have updated my patterns.');
         }
     },
     exit: {
@@ -15523,7 +15998,36 @@ async function handleCommand(input) {
             }
             // Check if it's an existing command
             else if (commands[cmd]) {
-                await commands[cmd].action();
+                const startTime = Date.now();
+                try {
+                    await commands[cmd].action();
+                    const executionTime = Date.now() - startTime;
+                    
+                    // Record successful command execution for ML
+                    if (mlEngine.enabled) {
+                        mlEngine.recordInteraction(cmd, true, executionTime, {
+                            args: args || null,
+                            voiceInput: false
+                        });
+                        
+                        // Check for command prediction
+                        const prediction = mlEngine.predictNextCommand(cmd);
+                        if (prediction && prediction.confidence > 0.7) {
+                            console.log(`${colors.dim}[ML] Suggestion: Next command might be "${prediction.command}" (${(prediction.confidence * 100).toFixed(0)}% confidence)${colors.reset}`);
+                        }
+                    }
+                } catch (error) {
+                    const executionTime = Date.now() - startTime;
+                    
+                    // Record failed command execution for ML
+                    if (mlEngine.enabled) {
+                        mlEngine.recordInteraction(cmd, false, executionTime, {
+                            error: error.message,
+                            args: args || null
+                        });
+                    }
+                    throw error;
+                }
             } else if (cmd === 'voice-speed' && args) {
                 // Handle voice-speed with parameter
                 const speed = parseFloat(args);
@@ -20531,6 +21035,30 @@ if (args[0] === 'dashboard-server') {
     // Initialize JARVIS with advanced UI
     (async () => {
         console.log(`${colors.cyan}\nInitializing J.A.R.V.I.S...\n${colors.reset}`);
+        
+        // Initialize ML and show personalized welcome
+        if (mlEngine.enabled && mlEngine.userProfile.preferences.preferredCommands.length > 0) {
+            console.log(`${colors.dim}[ML] Loading user profile and patterns...${colors.reset}`);
+            
+            // Show personalized suggestions on startup
+            const suggestions = mlEngine.getPersonalizedSuggestions();
+            if (suggestions.length > 0) {
+                console.log(`${colors.cyan}[ML] Personalized suggestions based on your usage:${colors.reset}`);
+                suggestions.forEach(suggestion => {
+                    console.log(`  ${colors.green}→${colors.reset} ${suggestion}`);
+                });
+            }
+            
+            // Adapt to user behavior
+            mlEngine.adaptToUser();
+            
+            // Show improvement metrics if available
+            const improvementRate = mlEngine.calculateImprovementRate();
+            if (improvementRate > 0) {
+                console.log(`${colors.green}[ML] Your efficiency has improved by ${improvementRate.toFixed(1)}% 📈${colors.reset}`);
+            }
+        }
+        
         await showWelcome();
     
     // Handle line input

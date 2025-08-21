@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-08-21T09:47:10.672Z",
+  "command": "ml-toggle",
+  "success": true,
+  "executionTime": 3,
+  "context": {
+    "args": null,
+    "voiceInput": false
+  },
+  "hour": 15,
+  "dayOfWeek": 4
+}

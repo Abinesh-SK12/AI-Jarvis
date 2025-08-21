@@ -1,0 +1,68 @@
+{
+  "ml-toggle": {
+    "frequency": 1,
+    "avgExecutionTime": 3,
+    "successRate": 1,
+    "timePreference": {
+      "afternoon": 1
+    },
+    "nextCommands": {
+      "ml-insights": 1
+    }
+  },
+  "ml-learn": {
+    "frequency": 1,
+    "avgExecutionTime": 7,
+    "successRate": 1,
+    "timePreference": {
+      "afternoon": 1
+    },
+    "nextCommands": {
+      "status": 1
+    }
+  },
+  "ml-insights": {
+    "frequency": 3,
+    "avgExecutionTime": 5,
+    "successRate": 1,
+    "timePreference": {
+      "afternoon": 3
+    },
+    "nextCommands": {
+      "help": 1
+    }
+  },
+  "status": {
+    "frequency": 1,
+    "avgExecutionTime": 2,
+    "successRate": 1,
+    "timePreference": {
+      "afternoon": 1
+    },
+    "nextCommands": {
+      "game-mode": 1
+    }
+  },
+  "help": {
+    "frequency": 1,
+    "avgExecutionTime": 44,
+    "successRate": 1,
+    "timePreference": {
+      "afternoon": 1
+    },
+    "nextCommands": {
+      "ml-insights": 1
+    }
+  },
+  "game-mode": {
+    "frequency": 1,
+    "avgExecutionTime": 9,
+    "successRate": 1,
+    "timePreference": {
+      "afternoon": 1
+    },
+    "nextCommands": {
+      "ml-insights": 1
+    }
+  }
+}
