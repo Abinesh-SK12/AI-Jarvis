@@ -64,5 +64,14 @@
     "nextCommands": {
       "ml-insights": 1
     }
+  },
+  "dashboard": {
+    "frequency": 1,
+    "avgExecutionTime": 15,
+    "successRate": 1,
+    "timePreference": {
+      "afternoon": 1
+    },
+    "nextCommands": {}
   }
 }
