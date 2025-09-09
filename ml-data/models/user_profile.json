@@ -8,6 +8,10 @@
         "frequency": 3
       },
       {
+        "command": "chat",
+        "frequency": 2
+      },
+      {
         "command": "ml-toggle",
         "frequency": 1
       },
@@ -17,10 +21,6 @@
       },
       {
         "command": "status",
-        "frequency": 1
-      },
-      {
-        "command": "help",
         "frequency": 1
       }
     ],

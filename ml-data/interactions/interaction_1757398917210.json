@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-09-09T06:21:57.207Z",
+  "command": "test",
+  "success": true,
+  "executionTime": 38,
+  "context": {
+    "args": null,
+    "voiceInput": false
+  },
+  "hour": 11,
+  "dayOfWeek": 2
+}

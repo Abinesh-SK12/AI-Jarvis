@@ -73,5 +73,23 @@
       "afternoon": 1
     },
     "nextCommands": {}
+  },
+  "chat": {
+    "frequency": 2,
+    "avgExecutionTime": 1,
+    "successRate": 1,
+    "timePreference": {
+      "morning": 2
+    },
+    "nextCommands": {}
+  },
+  "test": {
+    "frequency": 1,
+    "avgExecutionTime": 38,
+    "successRate": 1,
+    "timePreference": {
+      "morning": 1
+    },
+    "nextCommands": {}
   }
 }

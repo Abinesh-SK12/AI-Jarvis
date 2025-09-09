@@ -135,6 +135,122 @@ To create an intelligent, intuitive, and incredibly helpful AI assistant that ma
 
 ---
 
+## 🎮 Complete Command Reference
+
+### 💬 ChatGPT-Like Conversation Commands
+- `chat <message>` - Start or continue conversation with memory context
+- `new-chat` - Start fresh conversation (clears context)
+- `chat-history` - View current conversation history
+- `export-chat [format]` - Export conversation (markdown/json)
+- `chat-settings` - Configure chat settings (streaming, typing effect)
+- `chat-stats` - Show conversation statistics
+
+### 📝 Productivity & Workflow
+- `todo <task>` - Add/view todo items
+- `reminder <time> <msg>` - Set a reminder (e.g., "reminder 10 min meeting")
+- `timer <minutes>` - Set a countdown timer
+- `pomodoro` - Start 25-minute work session
+- `break` - Take a break reminder
+- `note <text>` - Save quick notes
+- `schedule` - View calendar/schedule
+
+### 🛠️ Development Tools
+- `git <command>` - Execute git commands
+- `commit <message>` - Quick commit with message
+- `push` - Push to remote repository
+- `pull` - Pull latest changes
+- `branch [name]` - Create/switch branches
+- `npm <command>` - NPM operations
+- `build` - Build project
+- `lint` - Run code linter
+- `format` - Auto-format code
+
+### 🤖 AI & Learning
+- `explain <code/concept>` - AI explains code or concepts
+- `optimize <code>` - AI optimizes your code
+- `review <file>` - AI code review
+- `generate <type>` - Generate code/tests/documentation
+- `suggest-tests` - AI suggests test cases
+- `auto-fix` - Auto-fix common coding errors
+- `ai-analyze` - Deep AI analysis
+
+### 💻 System Monitoring
+- `cpu` - View CPU usage information
+- `memory` - Memory usage statistics
+- `disk` - Disk space information
+- `network` - Network status and connectivity
+- `processes` - List running processes
+- `battery` - Battery status
+- `scan [target]` - System security scan
+
+### 🌐 Information & Entertainment
+- `weather [city]` - Get weather forecast
+- `news [topic]` - Latest news updates
+- `joke` - Tell a random joke
+- `quote` - Inspirational quote
+- `fact` - Random interesting fact
+- `stock <symbol>` - Stock market prices
+- `crypto <coin>` - Cryptocurrency prices
+
+### 📁 File Management
+- `open <file/folder>` - Open file or folder
+- `create <file>` - Create new file
+- `delete <file>` - Delete file
+- `rename <old> to <new>` - Rename files
+- `copy <src> to <dest>` - Copy files
+- `move <src> to <dest>` - Move files
+- `search <query>` - Search for files
+- `compress <folder>` - Create zip archive
+- `extract <archive>` - Extract compressed files
+
+### 🎨 Customization
+- `theme <name>` - Change UI theme (iron-man, matrix, tron, dark, light)
+- `voice <name>` - Change voice assistant
+- `voice list` - List available voices
+- `speed <rate>` - Adjust speech speed (0.5-2.0)
+- `volume <level>` - Set volume (0-100)
+- `jarvis-mode <mode>` - Switch modes (work/casual/gaming)
+- `personality <type>` - Change JARVIS personality
+
+### ⚡ Quick Actions
+- `screenshot` - Take a screenshot
+- `clipboard` - Show clipboard content
+- `clear` - Clear screen
+- `refresh` - Refresh display
+- `dashboard` - Open web dashboard
+- `fullscreen` - Toggle fullscreen mode
+- `zoom <in/out>` - Adjust zoom level
+
+### 🎯 JARVIS-Specific Features
+- `jarvis-mode <mode>` - Switch between work/casual/gaming modes
+- `stats` - View session statistics
+- `achievements` - View unlocked achievements
+- `leaderboard` - Show global leaderboard
+- `upgrade` - Check for JARVIS updates
+- `ai-status` - Check AI provider status
+- `feedback <message>` - Send feedback
+- `report <issue>` - Report bugs
+
+### 🧪 Testing Commands
+- `test` - Run all Cypress tests
+- `test-smart` - Run only affected tests
+- `test-failed` - Re-run failed tests
+- `open-cypress` - Open Cypress Test Runner
+- `coverage` - View test coverage
+- `performance` - Performance analysis
+- `benchmark` - Run performance benchmarks
+
+### 🔧 System Commands
+- `help` - Show main help menu
+- `help <category>` - Show category-specific help
+- `exit` - Exit JARVIS
+- `restart` - Restart JARVIS
+- `update` - Check for updates
+- `config` - View configuration
+- `version` - Show version info
+
+---
+
 ## ⚡ Quick Start
 
 ### 📋 Prerequisites

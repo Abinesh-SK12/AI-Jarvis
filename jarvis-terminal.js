@@ -206,6 +206,98 @@ const gameMode = {
     }
 };
 
+// ChatGPT-like Conversation System
+const conversationSystem = {
+    enabled: true,
+    conversations: new Map(),
+    activeConversationId: null,
+    messageHistory: [],
+    maxContextLength: 10,
+    streamingEnabled: true,
+    
+    // Conversation settings
+    settings: {
+        temperature: 0.7,
+        maxTokens: 2000,
+        contextMemory: true,
+        autoSave: true,
+        typingEffect: true,
+        multiTurn: true
+    },
+    
+    // Create new conversation
+    createConversation: function(title = 'New Chat') {
+        const id = `chat_${Date.now()}`;
+        const conversation = {
+            id,
+            title,
+            messages: [],
+            created: new Date().toISOString(),
+            model: systemState.aiProvider
+        };
+        this.conversations.set(id, conversation);
+        this.activeConversationId = id;
+        return conversation;
+    },
+    
+    // Add message to conversation
+    addMessage: function(role, content) {
+        const conv = this.getActiveConversation();
+        if (!conv) {
+            this.createConversation();
+        }
+        const message = {
+            role,
+            content,
+            timestamp: new Date().toISOString()
+        };
+        this.conversations.get(this.activeConversationId).messages.push(message);
+        this.messageHistory.push(message);
+        return message;
+    },
+    
+    // Get active conversation
+    getActiveConversation: function() {
+        if (!this.activeConversationId) return null;
+        return this.conversations.get(this.activeConversationId);
+    },
+    
+    // Get context for AI
+    getContext: function() {
+        const conv = this.getActiveConversation();
+        if (!conv) return [];
+        
+        const messages = conv.messages.slice(-this.maxContextLength);
+        return messages.map(m => ({
+            role: m.role === 'user' ? 'user' : 'assistant',
+            content: m.content
+        }));
+    },
+    
+    // Export conversation
+    exportConversation: function(format = 'json') {
+        const conv = this.getActiveConversation();
+        if (!conv) return null;
+        
+        if (format === 'markdown') {
+            let md = `# ${conv.title}\n\n`;
+            conv.messages.forEach(m => {
+                const prefix = m.role === 'user' ? '**You:**' : '**JARVIS:**';
+                md += `${prefix} ${m.content}\n\n`;
+            });
+            return md;
+        }
+        return JSON.stringify(conv, null, 2);
+    },
+    
+    // Clear conversation
+    clearConversation: function() {
+        if (this.activeConversationId) {
+            this.conversations.get(this.activeConversationId).messages = [];
+        }
+    }
+};
+
 // Machine Learning Engine for continuous improvement
 const mlEngine = {
     enabled: true,
@@ -3998,6 +4090,25 @@ const commands = {
             console.log(`${colors.dim}•${colors.reset} Test ${colors.green}rename-files${colors.reset} with one file before bulk operations`);
             
             console.log(`\n${colors.dim}Type any command for more details. Press TAB for auto-complete.${colors.reset}`);
+        }
+    },
+    'help-new': {
+        description: 'Show categorized help menu',
+        action: (args) => {
+            // If args provided, show category help
+            if (args && args.length > 0) {
+                const category = args.replace(/[<>]/g, '').trim();
+                showCategoryHelp(category);
+            } else {
+                // Show new categorized help menu
+                showMainHelp();
+            }
+        }
+    },
+    'help-categories': {
+        description: 'Show help categories',
+        action: () => {
+            showMainHelp();
         }
     },
     status: {
@@ -15375,6 +15486,167 @@ async function batchRename(pattern, replacement) {
     }
 }
 
+// Help menu display functions
+function showMainHelp() {
+    console.log(`\n${colors.cyan}╔════════════════════════════════════════════════════════════════════════════╗${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}                       ${colors.green}JARVIS COMMAND INTERFACE${colors.reset}                            ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}╠════════════════════════════════════════════════════════════════════════════╣${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset} Type ${colors.yellow}'help'${colors.reset} followed by a category for detailed commands:                 ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset} Example: ${colors.green}help test${colors.reset}  or  ${colors.green}help chat${colors.reset}  or  ${colors.green}help dev${colors.reset}                       ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}                                                                            ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}   ${colors.green}chat${colors.reset}         - ChatGPT-like conversation commands                       ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}   ${colors.green}productivity${colors.reset} - Todo, reminders, timers, notes                          ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}   ${colors.green}dev${colors.reset}          - Git, npm, build, development tools                      ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}   ${colors.green}ai${colors.reset}           - AI-powered code analysis and generation                 ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}   ${colors.green}system${colors.reset}       - System monitoring and management                        ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}   ${colors.green}info${colors.reset}         - Weather, news, jokes, quotes, facts                     ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}   ${colors.green}files${colors.reset}        - File management commands                                ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}   ${colors.green}custom${colors.reset}       - Themes, voice, settings customization                   ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}   ${colors.green}quick${colors.reset}        - Quick actions and shortcuts                             ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}   ${colors.green}test${colors.reset}         - Testing and Cypress commands                            ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}   ${colors.green}jarvis${colors.reset}       - JARVIS-specific features                                ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset}                                                                            ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}║${colors.reset} ${colors.dim}Quick commands: exit, clear, help, dashboard${colors.reset}                             ${colors.cyan}║${colors.reset}`);
+    console.log(`${colors.cyan}╚════════════════════════════════════════════════════════════════════════════╝${colors.reset}`);
+    speak('Help menu displayed. Say help followed by a category for more details.');
+}
+
+function showCategoryHelp(category) {
+    const cat = category.toLowerCase();
+    
+    switch(cat) {
+        case 'chat':
+        case 'conversation':
+            console.log(`\n${colors.cyan}═══ CHAT COMMANDS ═══${colors.reset}`);
+            console.log(`  ${colors.green}chat <message>${colors.reset}       - Start or continue conversation with memory`);
+            console.log(`  ${colors.green}new-chat${colors.reset}             - Start fresh conversation`);
+            console.log(`  ${colors.green}chat-history${colors.reset}         - View conversation history`);
+            console.log(`  ${colors.green}export-chat [format]${colors.reset} - Export chat (markdown/json)`);
+            console.log(`  ${colors.green}chat-settings${colors.reset}        - Configure chat settings`);
+            console.log(`  ${colors.green}chat-stats${colors.reset}           - Show conversation statistics`);
+            break;
+            
+        case 'productivity':
+        case 'workflow':
+            console.log(`\n${colors.cyan}═══ PRODUCTIVITY COMMANDS ═══${colors.reset}`);
+            console.log(`  ${colors.green}todo <task>${colors.reset}          - Add/view todo items`);
+            console.log(`  ${colors.green}reminder <time> <msg>${colors.reset}- Set a reminder`);
+            console.log(`  ${colors.green}timer <minutes>${colors.reset}      - Set a timer`);
+            console.log(`  ${colors.green}pomodoro${colors.reset}             - Start 25-min work session`);
+            console.log(`  ${colors.green}break${colors.reset}                - Take a break`);
+            console.log(`  ${colors.green}note <text>${colors.reset}          - Save a quick note`);
+            console.log(`  ${colors.green}schedule${colors.reset}             - View calendar`);
+            break;
+            
+        case 'dev':
+        case 'development':
+            console.log(`\n${colors.cyan}═══ DEVELOPMENT COMMANDS ═══${colors.reset}`);
+            console.log(`  ${colors.green}git <command>${colors.reset}        - Git operations`);
+            console.log(`  ${colors.green}commit <message>${colors.reset}     - Quick commit`);
+            console.log(`  ${colors.green}push${colors.reset}                 - Push to remote`);
+            console.log(`  ${colors.green}pull${colors.reset}                 - Pull latest`);
+            console.log(`  ${colors.green}branch [name]${colors.reset}        - Create/switch branch`);
+            console.log(`  ${colors.green}npm <command>${colors.reset}        - NPM operations`);
+            console.log(`  ${colors.green}build${colors.reset}                - Build project`);
+            console.log(`  ${colors.green}test${colors.reset}                 - Run tests`);
+            console.log(`  ${colors.green}lint${colors.reset}                 - Run linter`);
+            break;
+            
+        case 'ai':
+        case 'learning':
+            console.log(`\n${colors.cyan}═══ AI COMMANDS ═══${colors.reset}`);
+            console.log(`  ${colors.green}explain <code>${colors.reset}       - AI explains code/concept`);
+            console.log(`  ${colors.green}optimize <code>${colors.reset}      - AI optimizes code`);
+            console.log(`  ${colors.green}review <file>${colors.reset}        - AI code review`);
+            console.log(`  ${colors.green}generate <type>${colors.reset}      - Generate code/tests`);
+            console.log(`  ${colors.green}suggest-tests${colors.reset}        - AI suggests tests`);
+            console.log(`  ${colors.green}auto-fix${colors.reset}             - Auto-fix code issues`);
+            console.log(`  ${colors.green}ai-analyze${colors.reset}           - Deep AI analysis`);
+            break;
+            
+        case 'system':
+        case 'monitoring':
+            console.log(`\n${colors.cyan}═══ SYSTEM COMMANDS ═══${colors.reset}`);
+            console.log(`  ${colors.green}cpu${colors.reset}                  - CPU usage info`);
+            console.log(`  ${colors.green}memory${colors.reset}               - Memory usage`);
+            console.log(`  ${colors.green}disk${colors.reset}                 - Disk space`);
+            console.log(`  ${colors.green}network${colors.reset}              - Network status`);
+            console.log(`  ${colors.green}processes${colors.reset}            - Running processes`);
+            console.log(`  ${colors.green}scan [target]${colors.reset}        - System scan`);
+            console.log(`  ${colors.green}battery${colors.reset}              - Battery status`);
+            break;
+            
+        case 'info':
+        case 'entertainment':
+            console.log(`\n${colors.cyan}═══ INFO & ENTERTAINMENT ═══${colors.reset}`);
+            console.log(`  ${colors.green}weather [city]${colors.reset}       - Weather forecast`);
+            console.log(`  ${colors.green}news [topic]${colors.reset}         - Latest news`);
+            console.log(`  ${colors.green}joke${colors.reset}                 - Tell a joke`);
+            console.log(`  ${colors.green}quote${colors.reset}                - Inspirational quote`);
+            console.log(`  ${colors.green}fact${colors.reset}                 - Random fact`);
+            console.log(`  ${colors.green}stock <symbol>${colors.reset}       - Stock price`);
+            console.log(`  ${colors.green}crypto <coin>${colors.reset}        - Crypto price`);
+            break;
+            
+        case 'files':
+        case 'file':
+            console.log(`\n${colors.cyan}═══ FILE COMMANDS ═══${colors.reset}`);
+            console.log(`  ${colors.green}open <file>${colors.reset}          - Open file/folder`);
+            console.log(`  ${colors.green}create <file>${colors.reset}        - Create new file`);
+            console.log(`  ${colors.green}delete <file>${colors.reset}        - Delete file`);
+            console.log(`  ${colors.green}rename <old> to <new>${colors.reset}- Rename file`);
+            console.log(`  ${colors.green}copy <src> to <dest>${colors.reset} - Copy file`);
+            console.log(`  ${colors.green}search <query>${colors.reset}       - Search files`);
+            console.log(`  ${colors.green}move <src> to <dest>${colors.reset} - Move file`);
+            break;
+            
+        case 'custom':
+        case 'customization':
+            console.log(`\n${colors.cyan}═══ CUSTOMIZATION ═══${colors.reset}`);
+            console.log(`  ${colors.green}theme <name>${colors.reset}         - Change theme`);
+            console.log(`  ${colors.green}voice <name>${colors.reset}         - Change voice`);
+            console.log(`  ${colors.green}voice list${colors.reset}           - List available voices`);
+            console.log(`  ${colors.green}speed <rate>${colors.reset}         - Speech speed (0.5-2.0)`);
+            console.log(`  ${colors.green}volume <level>${colors.reset}       - Volume (0-100)`);
+            console.log(`  ${colors.green}jarvis-mode <mode>${colors.reset}   - Switch mode`);
+            break;
+            
+        case 'quick':
+        case 'actions':
+            console.log(`\n${colors.cyan}═══ QUICK ACTIONS ═══${colors.reset}`);
+            console.log(`  ${colors.green}screenshot${colors.reset}           - Take screenshot`);
+            console.log(`  ${colors.green}clipboard${colors.reset}            - Show clipboard`);
+            console.log(`  ${colors.green}clear${colors.reset}                - Clear screen`);
+            console.log(`  ${colors.green}refresh${colors.reset}              - Refresh display`);
+            console.log(`  ${colors.green}dashboard${colors.reset}            - Open web dashboard`);
+            break;
+            
+        case 'test':
+        case 'testing':
+            console.log(`\n${colors.cyan}═══ TESTING COMMANDS ═══${colors.reset}`);
+            console.log(`  ${colors.green}test${colors.reset}                 - Run all tests`);
+            console.log(`  ${colors.green}test-smart${colors.reset}           - Run affected tests`);
+            console.log(`  ${colors.green}test-failed${colors.reset}          - Re-run failed tests`);
+            console.log(`  ${colors.green}open-cypress${colors.reset}         - Open Cypress`);
+            console.log(`  ${colors.green}coverage${colors.reset}             - Test coverage`);
+            console.log(`  ${colors.green}performance${colors.reset}          - Performance analysis`);
+            break;
+            
+        case 'jarvis':
+            console.log(`\n${colors.cyan}═══ JARVIS FEATURES ═══${colors.reset}`);
+            console.log(`  ${colors.green}jarvis-mode <mode>${colors.reset}   - work/casual/gaming`);
+            console.log(`  ${colors.green}stats${colors.reset}                - Session statistics`);
+            console.log(`  ${colors.green}achievements${colors.reset}         - View achievements`);
+            console.log(`  ${colors.green}leaderboard${colors.reset}          - Show leaderboard`);
+            console.log(`  ${colors.green}upgrade${colors.reset}              - Check for updates`);
+            console.log(`  ${colors.green}ai-status${colors.reset}            - AI provider status`);
+            break;
+            
+        default:
+            console.log(`${colors.yellow}[JARVIS]${colors.reset} Unknown category. Try: chat, productivity, dev, ai, system, info, files, custom, quick, test, jarvis`);
+    }
+}
+
 async function handleCommand(input) {
     isInputActive = false; // Not in input mode while processing
     lastInputBox = null; // Clear input box flag
@@ -15813,6 +16085,784 @@ async function handleCommand(input) {
             speak(`You have been working for ${workMinutes} minutes. Next break in ${nextBreakIn} minutes.`);
             break;
             
+        case 'chat':
+        case 'conversation':
+            // Start or continue a conversation with context memory
+            if (args) {
+                // Add user message to conversation
+                conversationSystem.addMessage('user', args);
+                
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} Processing with conversation context...`);
+                
+                // Get conversation context
+                const context = conversationSystem.getContext();
+                
+                // Build prompt with context
+                let fullPrompt = '';
+                if (context.length > 0) {
+                    fullPrompt = 'Previous conversation:\n';
+                    context.forEach(msg => {
+                        fullPrompt += `${msg.role}: ${msg.content}\n`;
+                    });
+                    fullPrompt += `\nuser: ${args}\n\nRespond as JARVIS, maintaining context from the conversation above.`;
+                } else {
+                    fullPrompt = args;
+                }
+                
+                // Get AI response with streaming effect
+                const aiResponse = await getAIAnalysis(fullPrompt);
+                
+                if (conversationSystem.settings.typingEffect) {
+                    // Simulate typing effect
+                    console.log(`${colors.cyan}[JARVIS]${colors.reset} `);
+                    for (let i = 0; i < aiResponse.length; i += 3) {
+                        process.stdout.write(aiResponse.substring(i, i + 3));
+                        await new Promise(resolve => setTimeout(resolve, 10));
+                    }
+                    console.log('');
+                } else {
+                    console.log(`${colors.cyan}[JARVIS]${colors.reset} ${aiResponse}`);
+                }
+                
+                // Add assistant response to conversation
+                conversationSystem.addMessage('assistant', aiResponse);
+                
+                // Speak the response
+                speak(aiResponse.substring(0, 100)); // Speak first 100 chars
+                
+            } else {
+                console.log(`${colors.cyan}[JARVIS]${colors.reset} Starting new conversation. Type 'chat <your message>' to begin.`);
+                conversationSystem.createConversation();
+                console.log(`${colors.dim}Conversation mode active. I'll remember our context.${colors.reset}`);
+            }
+            break;
+            
+        case 'new-chat':
+        case 'clear-chat':
+            // Start a fresh conversation
+            conversationSystem.createConversation();
+            console.log(`${colors.green}[JARVIS]${colors.reset} New conversation started. Previous context cleared.`);
+            speak('New conversation started');
+            break;
+            
+        case 'chat-history':
+        case 'show-chat':
+            // Show current conversation
+            const conv = conversationSystem.getActiveConversation();
+            if (conv && conv.messages.length > 0) {
+                console.log(`\n${colors.cyan}═══ CONVERSATION HISTORY ═══${colors.reset}`);
+                conv.messages.forEach(msg => {
+                    const prefix = msg.role === 'user' ? `${colors.green}You:${colors.reset}` : `${colors.cyan}JARVIS:${colors.reset}`;
+                    console.log(`${prefix} ${msg.content.substring(0, 100)}${msg.content.length > 100 ? '...' : ''}`);
+                });
+                console.log(`${colors.dim}Total messages: ${conv.messages.length}${colors.reset}`);
+            } else {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} No conversation history yet.`);
+            }
+            break;
+            
+        case 'export-chat':
+            // Export conversation to file
+            const format = args || 'markdown';
+            const exportData = conversationSystem.exportConversation(format);
+            if (exportData) {
+                const filename = `conversation_${Date.now()}.${format === 'markdown' ? 'md' : 'json'}`;
+                fs.writeFileSync(filename, exportData);
+                console.log(`${colors.green}[JARVIS]${colors.reset} Conversation exported to ${filename}`);
+                speak('Conversation exported successfully');
+            } else {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} No conversation to export.`);
+            }
+            break;
+            
+        case 'chat-settings':
+            // Show or modify chat settings
+            if (args) {
+                const [setting, value] = args.split(' ');
+                if (setting === 'streaming' && value) {
+                    conversationSystem.settings.streamingEnabled = value === 'on';
+                    console.log(`${colors.green}[JARVIS]${colors.reset} Streaming ${value === 'on' ? 'enabled' : 'disabled'}`);
+                } else if (setting === 'context' && value) {
+                    conversationSystem.maxContextLength = parseInt(value) || 10;
+                    console.log(`${colors.green}[JARVIS]${colors.reset} Context length set to ${conversationSystem.maxContextLength} messages`);
+                } else if (setting === 'typing' && value) {
+                    conversationSystem.settings.typingEffect = value === 'on';
+                    console.log(`${colors.green}[JARVIS]${colors.reset} Typing effect ${value === 'on' ? 'enabled' : 'disabled'}`);
+                }
+            } else {
+                console.log(`\n${colors.cyan}═══ CHAT SETTINGS ═══${colors.reset}`);
+                console.log(`  Streaming: ${conversationSystem.settings.streamingEnabled ? '✅' : '❌'}`);
+                console.log(`  Typing Effect: ${conversationSystem.settings.typingEffect ? '✅' : '❌'}`);
+                console.log(`  Context Memory: ${conversationSystem.settings.contextMemory ? '✅' : '❌'}`);
+                console.log(`  Max Context: ${conversationSystem.maxContextLength} messages`);
+                console.log(`  Auto-save: ${conversationSystem.settings.autoSave ? '✅' : '❌'}`);
+                console.log(`\n${colors.dim}Usage: chat-settings <setting> <value>${colors.reset}`);
+                console.log(`${colors.dim}Example: chat-settings typing on${colors.reset}`);
+            }
+            break;
+            
+        case 'chat-stats':
+            // Show conversation statistics
+            const activeConv = conversationSystem.getActiveConversation();
+            if (activeConv) {
+                const userMessages = activeConv.messages.filter(m => m.role === 'user').length;
+                const assistantMessages = activeConv.messages.filter(m => m.role === 'assistant').length;
+                const totalChars = activeConv.messages.reduce((sum, m) => sum + m.content.length, 0);
+                
+                console.log(`\n${colors.cyan}═══ CONVERSATION STATS ═══${colors.reset}`);
+                console.log(`  Conversation ID: ${activeConv.id}`);
+                console.log(`  Created: ${new Date(activeConv.created).toLocaleString()}`);
+                console.log(`  Total Messages: ${activeConv.messages.length}`);
+                console.log(`  Your Messages: ${userMessages}`);
+                console.log(`  JARVIS Responses: ${assistantMessages}`);
+                console.log(`  Total Characters: ${totalChars}`);
+                console.log(`  AI Model: ${activeConv.model || systemState.aiProvider}`);
+            } else {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} No active conversation.`);
+            }
+            break;
+            
+        case 'help':
+        case '?':
+            // Just use the command object help instead
+            if (commands.help) {
+                commands.help.action();
+            }
+            break;
+            
+        case 'help-new':
+        case 'help-categories':
+            // Check if specific help category requested
+            if (args) {
+                // Remove angle brackets if present
+                const cleanCategory = args.replace(/[<>]/g, '').trim();
+                showCategoryHelp(cleanCategory);
+            } else {
+                showMainHelp();
+            }
+            break;
+            
+        // ============= PRODUCTIVITY & WORKFLOW COMMANDS =============
+        case 'todo':
+            if (args) {
+                if (!systemState.todoList) systemState.todoList = [];
+                systemState.todoList.push({ task: args, completed: false, created: new Date().toISOString() });
+                console.log(`${colors.green}[JARVIS]${colors.reset} Added to todo list: ${args}`);
+                speak('Task added to your todo list');
+            } else {
+                if (systemState.todoList && systemState.todoList.length > 0) {
+                    console.log(`\n${colors.cyan}═══ TODO LIST ═══${colors.reset}`);
+                    systemState.todoList.forEach((item, i) => {
+                        const status = item.completed ? '✅' : '⬜';
+                        console.log(`  ${status} ${i + 1}. ${item.task}`);
+                    });
+                } else {
+                    console.log(`${colors.yellow}[JARVIS]${colors.reset} Your todo list is empty.`);
+                }
+            }
+            break;
+            
+        case 'reminder':
+            if (args) {
+                const parts = args.match(/(\d+)\s*(min|hour|hr|minute|minutes|hours)?\s+(.+)/);
+                if (parts) {
+                    const time = parseInt(parts[1]);
+                    const unit = parts[2] || 'min';
+                    const message = parts[3];
+                    const ms = unit.includes('hour') ? time * 3600000 : time * 60000;
+                    
+                    setTimeout(() => {
+                        console.log(`\n${colors.red}🔔 REMINDER: ${message}${colors.reset}`);
+                        speak(`Reminder: ${message}`);
+                        notifier.notify({
+                            title: 'JARVIS Reminder',
+                            message: message,
+                            sound: true
+                        });
+                    }, ms);
+                    
+                    console.log(`${colors.green}[JARVIS]${colors.reset} Reminder set for ${time} ${unit} from now`);
+                    speak(`Reminder set for ${time} ${unit}`);
+                }
+            } else {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} Usage: reminder <time> <unit> <message>`);
+            }
+            break;
+            
+        case 'pomodoro':
+            console.log(`${colors.green}[JARVIS]${colors.reset} Starting 25-minute Pomodoro session...`);
+            speak('Pomodoro session started. Focus for 25 minutes.');
+            systemState.pomodoroActive = true;
+            
+            setTimeout(() => {
+                console.log(`\n${colors.red}🍅 POMODORO COMPLETE!${colors.reset} Take a 5-minute break.`);
+                speak('Pomodoro complete! Time for a break.');
+                playSound('success');
+                systemState.pomodoroActive = false;
+            }, 25 * 60000);
+            break;
+            
+        case 'note':
+            if (args) {
+                const note = {
+                    content: args,
+                    timestamp: new Date().toISOString()
+                };
+                if (!systemState.notes) systemState.notes = [];
+                systemState.notes.push(note);
+                console.log(`${colors.green}[JARVIS]${colors.reset} Note saved.`);
+                speak('Note saved');
+            } else {
+                if (systemState.notes && systemState.notes.length > 0) {
+                    console.log(`\n${colors.cyan}═══ YOUR NOTES ═══${colors.reset}`);
+                    systemState.notes.slice(-5).forEach((note, i) => {
+                        console.log(`${i + 1}. ${note.content}`);
+                        console.log(`   ${colors.dim}${new Date(note.timestamp).toLocaleString()}${colors.reset}`);
+                    });
+                } else {
+                    console.log(`${colors.yellow}[JARVIS]${colors.reset} No notes found.`);
+                }
+            }
+            break;
+            
+        // ============= DEVELOPMENT TOOLS COMMANDS =============
+        case 'git':
+            if (args) {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} Executing git ${args}...`);
+                exec(`git ${args}`, (error, stdout, stderr) => {
+                    if (error) {
+                        console.log(`${colors.red}[ERROR]${colors.reset} ${error.message}`);
+                    } else {
+                        console.log(stdout);
+                    }
+                    setTimeout(() => showInputBox(), 100);
+                });
+            } else {
+                // Show git status
+                exec('git status', (error, stdout) => {
+                    if (error) {
+                        console.log(`${colors.red}[ERROR]${colors.reset} Not a git repository`);
+                    } else {
+                        console.log(stdout);
+                    }
+                    setTimeout(() => showInputBox(), 100);
+                });
+            }
+            return;
+            
+        case 'commit':
+            if (args) {
+                exec(`git add . && git commit -m "${args}"`, (error, stdout) => {
+                    if (error) {
+                        console.log(`${colors.red}[ERROR]${colors.reset} ${error.message}`);
+                    } else {
+                        console.log(`${colors.green}[JARVIS]${colors.reset} Changes committed successfully`);
+                        console.log(stdout);
+                        speak('Changes committed');
+                    }
+                    setTimeout(() => showInputBox(), 100);
+                });
+            } else {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} Please provide a commit message`);
+                setTimeout(() => showInputBox(), 100);
+            }
+            return;
+            
+        case 'push':
+            console.log(`${colors.yellow}[JARVIS]${colors.reset} Pushing to remote repository...`);
+            exec('git push', (error, stdout, stderr) => {
+                if (error) {
+                    console.log(`${colors.red}[ERROR]${colors.reset} ${error.message}`);
+                } else {
+                    console.log(`${colors.green}[JARVIS]${colors.reset} Pushed successfully`);
+                    speak('Code pushed to remote');
+                }
+                setTimeout(() => showInputBox(), 100);
+            });
+            return;
+            
+        case 'pull':
+            console.log(`${colors.yellow}[JARVIS]${colors.reset} Pulling latest changes...`);
+            exec('git pull', (error, stdout) => {
+                if (error) {
+                    console.log(`${colors.red}[ERROR]${colors.reset} ${error.message}`);
+                } else {
+                    console.log(stdout);
+                    speak('Code updated from remote');
+                }
+                setTimeout(() => showInputBox(), 100);
+            });
+            return;
+            
+        case 'branch':
+            if (args) {
+                exec(`git checkout -b ${args}`, (error, stdout) => {
+                    if (error) {
+                        // Try switching to existing branch
+                        exec(`git checkout ${args}`, (error2, stdout2) => {
+                            if (error2) {
+                                console.log(`${colors.red}[ERROR]${colors.reset} ${error2.message}`);
+                            } else {
+                                console.log(`${colors.green}[JARVIS]${colors.reset} Switched to branch: ${args}`);
+                                speak(`Switched to ${args} branch`);
+                            }
+                            setTimeout(() => showInputBox(), 100);
+                        });
+                    } else {
+                        console.log(`${colors.green}[JARVIS]${colors.reset} Created and switched to branch: ${args}`);
+                        speak(`Created new branch ${args}`);
+                        setTimeout(() => showInputBox(), 100);
+                    }
+                });
+            } else {
+                exec('git branch', (error, stdout) => {
+                    if (error) {
+                        console.log(`${colors.red}[ERROR]${colors.reset} ${error.message}`);
+                    } else {
+                        console.log(`${colors.cyan}Git Branches:${colors.reset}`);
+                        console.log(stdout);
+                    }
+                    setTimeout(() => showInputBox(), 100);
+                });
+            }
+            return;
+            
+        case 'npm':
+            if (args) {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} Running npm ${args}...`);
+                exec(`npm ${args}`, (error, stdout, stderr) => {
+                    if (error) {
+                        console.log(`${colors.red}[ERROR]${colors.reset} ${error.message}`);
+                    } else {
+                        console.log(stdout);
+                    }
+                    setTimeout(() => showInputBox(), 100);
+                });
+            } else {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} Usage: npm <command>`);
+                setTimeout(() => showInputBox(), 100);
+            }
+            return;
+            
+        case 'build':
+            console.log(`${colors.yellow}[JARVIS]${colors.reset} Building project...`);
+            exec('npm run build', (error, stdout) => {
+                if (error) {
+                    console.log(`${colors.red}[ERROR]${colors.reset} Build failed: ${error.message}`);
+                } else {
+                    console.log(`${colors.green}[JARVIS]${colors.reset} Build completed successfully`);
+                    console.log(stdout);
+                    speak('Build completed');
+                }
+                setTimeout(() => showInputBox(), 100);
+            });
+            return;
+            
+        // ============= AI & LEARNING COMMANDS =============
+        case 'explain':
+            if (args) {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} Analyzing and explaining...`);
+                const prompt = `Explain this clearly and concisely: ${args}`;
+                getAIAnalysis(prompt).then(explanation => {
+                    console.log(`\n${colors.cyan}═══ EXPLANATION ═══${colors.reset}`);
+                    console.log(explanation);
+                    speak(explanation.substring(0, 100));
+                    setTimeout(() => showInputBox(), 100);
+                });
+            } else {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} What would you like me to explain?`);
+                setTimeout(() => showInputBox(), 100);
+            }
+            return;
+            
+        case 'optimize':
+            if (args) {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} Analyzing code for optimization...`);
+                const prompt = `Optimize this code and explain the improvements: ${args}`;
+                getAIAnalysis(prompt).then(optimized => {
+                    console.log(`\n${colors.cyan}═══ OPTIMIZED CODE ═══${colors.reset}`);
+                    console.log(optimized);
+                    speak('Code optimization complete');
+                    setTimeout(() => showInputBox(), 100);
+                });
+            }
+            return;
+            
+        case 'generate':
+            if (args) {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} Generating ${args}...`);
+                const prompt = `Generate ${args} with best practices and comments`;
+                getAIAnalysis(prompt).then(generated => {
+                    console.log(`\n${colors.cyan}═══ GENERATED CODE ═══${colors.reset}`);
+                    console.log(generated);
+                    speak(`${args} generated successfully`);
+                    setTimeout(() => showInputBox(), 100);
+                });
+            }
+            return;
+            
+        // ============= SYSTEM MONITORING COMMANDS =============
+        case 'cpu':
+            console.log(`${colors.cyan}═══ CPU USAGE ═══${colors.reset}`);
+            console.log(`  Current: ${systemState.cpuUsage}%`);
+            console.log(`  Cores: ${os.cpus().length}`);
+            console.log(`  Model: ${os.cpus()[0].model}`);
+            speak(`CPU usage is ${systemState.cpuUsage} percent`);
+            break;
+            
+        case 'memory':
+            const totalMem = os.totalmem();
+            const freeMem = os.freemem();
+            const usedMem = totalMem - freeMem;
+            const usagePercent = Math.round((usedMem / totalMem) * 100);
+            
+            console.log(`${colors.cyan}═══ MEMORY USAGE ═══${colors.reset}`);
+            console.log(`  Total: ${Math.round(totalMem / 1024 / 1024 / 1024)}GB`);
+            console.log(`  Used: ${Math.round(usedMem / 1024 / 1024 / 1024)}GB (${usagePercent}%)`);
+            console.log(`  Free: ${Math.round(freeMem / 1024 / 1024 / 1024)}GB`);
+            speak(`Memory usage is ${usagePercent} percent`);
+            break;
+            
+        case 'disk':
+            exec('df -h', (error, stdout) => {
+                if (error) {
+                    // Windows fallback
+                    exec('wmic logicaldisk get size,freespace,caption', (err, out) => {
+                        console.log(`${colors.cyan}═══ DISK USAGE ═══${colors.reset}`);
+                        console.log(out || 'Unable to retrieve disk info');
+                        setTimeout(() => showInputBox(), 100);
+                    });
+                } else {
+                    console.log(`${colors.cyan}═══ DISK USAGE ═══${colors.reset}`);
+                    console.log(stdout);
+                    setTimeout(() => showInputBox(), 100);
+                }
+            });
+            return;
+            
+        case 'network':
+            console.log(`${colors.cyan}═══ NETWORK STATUS ═══${colors.reset}`);
+            console.log(`  Status: ${systemState.networkStatus}`);
+            console.log(`  Latency: ${systemState.latency}ms`);
+            console.log(`  Ping: ${systemState.ping}ms`);
+            
+            // Test internet connectivity
+            exec('ping -c 1 google.com', (error) => {
+                if (error) {
+                    console.log(`  Internet: ${colors.red}Offline${colors.reset}`);
+                } else {
+                    console.log(`  Internet: ${colors.green}Online${colors.reset}`);
+                }
+                setTimeout(() => showInputBox(), 100);
+            });
+            return;
+            
+        case 'processes':
+            exec(isWindows ? 'tasklist' : 'ps aux', (error, stdout) => {
+                if (error) {
+                    console.log(`${colors.red}[ERROR]${colors.reset} ${error.message}`);
+                } else {
+                    const lines = stdout.split('\n').slice(0, 20);
+                    console.log(`${colors.cyan}═══ TOP PROCESSES ═══${colors.reset}`);
+                    lines.forEach(line => console.log(line));
+                    console.log(`${colors.dim}... and more${colors.reset}`);
+                }
+                setTimeout(() => showInputBox(), 100);
+            });
+            return;
+            
+        // ============= ENTERTAINMENT & INFO COMMANDS =============
+        case 'weather':
+            const city = args || 'Chennai';
+            getWeather(city).then(weather => {
+                if (weather) {
+                    console.log(`\n${colors.cyan}═══ WEATHER: ${city.toUpperCase()} ═══${colors.reset}`);
+                    console.log(`  Temperature: ${weather.temp}°C`);
+                    console.log(`  Condition: ${weather.condition}`);
+                    console.log(`  Humidity: ${weather.humidity}%`);
+                    console.log(`  Wind: ${weather.windSpeed} km/h`);
+                    speak(`Temperature in ${city} is ${weather.temp} degrees with ${weather.condition}`);
+                }
+                setTimeout(() => showInputBox(), 100);
+            });
+            return;
+            
+        case 'news':
+            const category = args || 'technology';
+            getNews(category).then(news => {
+                if (news && news.length > 0) {
+                    console.log(`\n${colors.cyan}═══ TOP ${category.toUpperCase()} NEWS ═══${colors.reset}`);
+                    news.slice(0, 5).forEach((item, i) => {
+                        console.log(`${i + 1}. ${item.title}`);
+                        if (item.description) {
+                            console.log(`   ${colors.dim}${item.description.substring(0, 100)}...${colors.reset}`);
+                        }
+                    });
+                    speak(`Found ${news.length} news articles`);
+                }
+                setTimeout(() => showInputBox(), 100);
+            });
+            return;
+            
+        case 'joke':
+            const jokes = [
+                "Why don't scientists trust atoms? Because they make up everything!",
+                "Why did the scarecrow win an award? He was outstanding in his field!",
+                "Why don't eggs tell jokes? They'd crack each other up!",
+                "What do you call a fake noodle? An impasta!",
+                "Why did the coffee file a police report? It got mugged!"
+            ];
+            const joke = jokes[Math.floor(Math.random() * jokes.length)];
+            console.log(`\n${colors.yellow}😄 ${joke}${colors.reset}`);
+            speak(joke);
+            break;
+            
+        case 'quote':
+            const quotes = [
+                "The only way to do great work is to love what you do. - Steve Jobs",
+                "Innovation distinguishes between a leader and a follower. - Steve Jobs",
+                "Life is what happens when you're busy making other plans. - John Lennon",
+                "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
+                "It is during our darkest moments that we must focus to see the light. - Aristotle"
+            ];
+            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+            console.log(`\n${colors.cyan}💭 ${quote}${colors.reset}`);
+            speak(quote);
+            break;
+            
+        case 'fact':
+            const facts = [
+                "Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old!",
+                "The human brain uses about 20% of the body's total energy.",
+                "Octopuses have three hearts and blue blood.",
+                "There are more possible games of chess than atoms in the observable universe.",
+                "Bananas are berries, but strawberries aren't."
+            ];
+            const fact = facts[Math.floor(Math.random() * facts.length)];
+            console.log(`\n${colors.green}📚 Did you know? ${fact}${colors.reset}`);
+            speak(fact);
+            break;
+            
+        // ============= FILE MANAGEMENT COMMANDS =============
+        case 'open':
+            if (args) {
+                open(args).then(() => {
+                    console.log(`${colors.green}[JARVIS]${colors.reset} Opened ${args}`);
+                    speak(`Opening ${args}`);
+                }).catch(err => {
+                    console.log(`${colors.red}[ERROR]${colors.reset} Could not open ${args}`);
+                });
+            }
+            break;
+            
+        case 'create':
+            if (args) {
+                fs.writeFileSync(args, '', 'utf8');
+                console.log(`${colors.green}[JARVIS]${colors.reset} Created file: ${args}`);
+                speak('File created');
+            }
+            break;
+            
+        case 'delete':
+            if (args) {
+                try {
+                    fs.unlinkSync(args);
+                    console.log(`${colors.green}[JARVIS]${colors.reset} Deleted: ${args}`);
+                    speak('File deleted');
+                } catch (error) {
+                    console.log(`${colors.red}[ERROR]${colors.reset} Could not delete ${args}`);
+                }
+            }
+            break;
+            
+        case 'rename':
+            if (args) {
+                const [oldName, newName] = args.split(' to ').map(s => s.trim());
+                if (oldName && newName) {
+                    try {
+                        fs.renameSync(oldName, newName);
+                        console.log(`${colors.green}[JARVIS]${colors.reset} Renamed ${oldName} to ${newName}`);
+                        speak('File renamed');
+                    } catch (error) {
+                        console.log(`${colors.red}[ERROR]${colors.reset} Could not rename file`);
+                    }
+                }
+            }
+            break;
+            
+        case 'copy':
+            if (args) {
+                const [source, dest] = args.split(' to ').map(s => s.trim());
+                if (source && dest) {
+                    try {
+                        fs.copyFileSync(source, dest);
+                        console.log(`${colors.green}[JARVIS]${colors.reset} Copied ${source} to ${dest}`);
+                        speak('File copied');
+                    } catch (error) {
+                        console.log(`${colors.red}[ERROR]${colors.reset} Could not copy file`);
+                    }
+                }
+            }
+            break;
+            
+        // ============= CUSTOMIZATION COMMANDS =============
+        case 'theme':
+            if (args) {
+                systemState.theme = args;
+                console.log(`${colors.green}[JARVIS]${colors.reset} Theme changed to: ${args}`);
+                speak(`Theme changed to ${args}`);
+            } else {
+                console.log(`${colors.cyan}Available themes:${colors.reset} iron-man, matrix, tron, dark, light`);
+            }
+            break;
+            
+        case 'voice':
+            if (args) {
+                if (args === 'list') {
+                    say.getInstalledVoices((err, voices) => {
+                        if (!err && voices) {
+                            console.log(`${colors.cyan}Available voices:${colors.reset}`);
+                            voices.forEach(v => console.log(`  • ${v}`));
+                        }
+                        setTimeout(() => showInputBox(), 100);
+                    });
+                    return;
+                } else {
+                    systemState.voice = args;
+                    console.log(`${colors.green}[JARVIS]${colors.reset} Voice changed to: ${args}`);
+                    speak(`Voice changed to ${args}`);
+                }
+            }
+            break;
+            
+        case 'speed':
+            if (args) {
+                const speed = parseFloat(args);
+                if (speed >= 0.5 && speed <= 2.0) {
+                    systemState.voiceSpeed = speed;
+                    console.log(`${colors.green}[JARVIS]${colors.reset} Speech speed set to ${speed}x`);
+                    speak(`Speech speed adjusted`);
+                }
+            }
+            break;
+            
+        case 'volume':
+            if (args) {
+                const volume = parseInt(args);
+                if (volume >= 0 && volume <= 100) {
+                    systemState.voiceVolume = volume / 100;
+                    console.log(`${colors.green}[JARVIS]${colors.reset} Volume set to ${volume}%`);
+                    speak(`Volume set to ${volume} percent`);
+                }
+            }
+            break;
+            
+        // ============= QUICK ACTIONS =============
+        case 'screenshot':
+            const screenshotName = `screenshot_${Date.now()}.png`;
+            console.log(`${colors.yellow}[JARVIS]${colors.reset} Taking screenshot...`);
+            // Platform specific screenshot command
+            const screenshotCmd = isWindows 
+                ? `powershell -command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('%{PRTSC}')"`
+                : `screencapture ${screenshotName}`;
+            
+            exec(screenshotCmd, (error) => {
+                if (error) {
+                    console.log(`${colors.red}[ERROR]${colors.reset} Could not take screenshot`);
+                } else {
+                    console.log(`${colors.green}[JARVIS]${colors.reset} Screenshot saved as ${screenshotName}`);
+                    speak('Screenshot captured');
+                }
+                setTimeout(() => showInputBox(), 100);
+            });
+            return;
+            
+        case 'clipboard':
+            exec(isWindows ? 'powershell Get-Clipboard' : 'pbpaste', (error, stdout) => {
+                if (error) {
+                    console.log(`${colors.red}[ERROR]${colors.reset} Could not access clipboard`);
+                } else {
+                    console.log(`${colors.cyan}═══ CLIPBOARD CONTENT ═══${colors.reset}`);
+                    console.log(stdout || '(empty)');
+                }
+                setTimeout(() => showInputBox(), 100);
+            });
+            return;
+            
+        // ============= JARVIS SPECIFIC =============
+        case 'jarvis-mode':
+            if (args) {
+                systemState.mode = args;
+                console.log(`${colors.green}[JARVIS]${colors.reset} Mode changed to: ${args}`);
+                speak(`Switching to ${args} mode`);
+                
+                // Apply mode-specific settings
+                if (args === 'work') {
+                    systemState.proactiveMode = true;
+                    systemState.breakReminderEnabled = true;
+                    console.log(`${colors.dim}Work mode: Break reminders enabled, proactive assistance on${colors.reset}`);
+                } else if (args === 'casual') {
+                    systemState.proactiveMode = false;
+                    systemState.breakReminderEnabled = false;
+                    console.log(`${colors.dim}Casual mode: Relaxed settings${colors.reset}`);
+                } else if (args === 'gaming') {
+                    gameMode.enabled = true;
+                    console.log(`${colors.dim}Gaming mode: Achievements and XP enabled${colors.reset}`);
+                }
+            }
+            break;
+            
+        case 'stats':
+            const uptime = Math.round((Date.now() - systemState.sessionStartTime) / 1000 / 60);
+            console.log(`\n${colors.cyan}═══ SESSION STATISTICS ═══${colors.reset}`);
+            console.log(`  Uptime: ${uptime} minutes`);
+            console.log(`  Commands executed: ${systemState.commandHistory.length}`);
+            console.log(`  AI Provider: ${systemState.aiProvider}`);
+            console.log(`  Mode: ${systemState.mode || 'default'}`);
+            console.log(`  Memory Usage: ${systemState.memoryUsage}%`);
+            console.log(`  CPU Usage: ${systemState.cpuUsage}%`);
+            
+            if (gameMode.enabled) {
+                console.log(`\n${colors.yellow}GAME STATS:${colors.reset}`);
+                console.log(`  Level: ${gameMode.player.level}`);
+                console.log(`  XP: ${gameMode.player.xp}/${gameMode.player.xpToNextLevel}`);
+                console.log(`  Coins: ${gameMode.player.coins}`);
+            }
+            break;
+            
+        case 'achievements':
+            if (gameMode.enabled) {
+                console.log(`\n${colors.cyan}═══ ACHIEVEMENTS ═══${colors.reset}`);
+                const unlocked = Object.values(gameMode.achievements).filter(a => a.unlocked);
+                const total = Object.keys(gameMode.achievements).length;
+                
+                console.log(`${colors.green}Unlocked: ${unlocked.length}/${total}${colors.reset}\n`);
+                
+                Object.values(gameMode.achievements).forEach(achievement => {
+                    const status = achievement.unlocked ? '✅' : '🔒';
+                    const color = achievement.unlocked ? colors.green : colors.dim;
+                    console.log(`${status} ${color}${achievement.name}${colors.reset}`);
+                    console.log(`   ${colors.dim}${achievement.description}${colors.reset}`);
+                });
+            } else {
+                console.log(`${colors.yellow}[JARVIS]${colors.reset} Enable game mode with 'jarvis-mode gaming' to track achievements`);
+            }
+            break;
+            
+        case 'upgrade':
+            console.log(`${colors.yellow}[JARVIS]${colors.reset} Checking for updates...`);
+            exec('npm outdated', (error, stdout) => {
+                if (stdout) {
+                    console.log(`${colors.cyan}Updates available:${colors.reset}`);
+                    console.log(stdout);
+                    console.log(`\n${colors.dim}Run 'npm update' to upgrade${colors.reset}`);
+                } else {
+                    console.log(`${colors.green}[JARVIS]${colors.reset} All systems up to date!`);
+                }
+                setTimeout(() => showInputBox(), 100);
+            });
+            return;
+            
         case 'exit':
             console.log(`\n${colors.yellow}[JARVIS] Shutting down systems...${colors.reset}`);
             console.log(`${colors.red}  • Neural cores offline`);
@@ -16000,7 +17050,7 @@ async function handleCommand(input) {
             else if (commands[cmd]) {
                 const startTime = Date.now();
                 try {
-                    await commands[cmd].action();
+                    await commands[cmd].action(args);
                     const executionTime = Date.now() - startTime;
                     
                     // Record successful command execution for ML
